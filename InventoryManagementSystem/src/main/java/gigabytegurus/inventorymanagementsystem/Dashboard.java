@@ -51,12 +51,26 @@ public class Dashboard
         buttonPanel.add(Box.createHorizontalStrut(20));
         buttonPanel.add(loginButton);
         panel.add(buttonPanel, constraint);
+        
+        // Action listeners
+        loginButton.addActionListener(e -> handleLogin());
+        registerButton.addActionListener(e -> handleRegister());
 
         // Setup window
         window.add(panel);
         window.setExtendedState(JFrame.MAXIMIZED_BOTH);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
+    }
+    
+    private void handleLogin()
+    {
+    	
+    }
+    
+    private void handleRegister()
+    {
+    	
     }
     
     public static void main(String[] args)
