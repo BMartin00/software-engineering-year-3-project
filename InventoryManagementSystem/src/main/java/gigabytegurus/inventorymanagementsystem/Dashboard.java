@@ -2,8 +2,8 @@ package gigabytegurus.inventorymanagementsystem;
 
 import java.awt.*;
 import java.sql.*;
-
 import javax.swing.*;
+
 
 public class Dashboard
 {
@@ -93,6 +93,7 @@ public class Dashboard
                         rs.getString("password"),
                         rs.getString("role")
                 );
+                openInventoryWindow();
             }
             else
             {
@@ -158,6 +159,16 @@ public class Dashboard
             JOptionPane.showMessageDialog(window, "Database error: " + ex.getMessage());
         }
     }
+    
+    public void openInventoryWindow()
+    {
+	    JFrame inventoryWindow = new JFrame("Inventory Dashboard");
+	    inventoryWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
+	    inventoryWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	
+	    window.setVisible(false);
+	    inventoryWindow.setVisible(true);
+	}
     
     public static void main(String[] args)
 	{
