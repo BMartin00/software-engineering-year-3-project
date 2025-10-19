@@ -109,7 +109,54 @@ public class Dashboard
     
     private void handleRegister()
     {
-    	
+    	String username = usernameInput.getText().trim();
+        String password = new String(passwordInput.getPassword());
+
+        if (username.isEmpty() || password.isEmpty())
+        {
+            JOptionPane.showMessageDialog(window, "Please fill in both username and password.");
+            return;
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection())
+        {
+            // Check if username already exists
+            String checkQuery = "SELECT * FROM users WHERE username=?";
+            PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+            checkStmt.setString(1, username);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next())
+            {
+                JOptionPane.showMessageDialog(window, "⚠️ Username already exists. Choose another one.");
+                return;
+            }
+
+            // Insert new user
+            String insertQuery = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+            PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
+            insertStmt.setString(1, username);
+            insertStmt.setString(2, password);
+            insertStmt.setString(3, "user");
+
+            int rows = insertStmt.executeUpdate();
+            if (rows > 0)
+            {
+                JOptionPane.showMessageDialog(window, "✅ Registration successful! You can now log in.");
+                usernameInput.setText("");
+                passwordInput.setText("");
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(window, "⚠️ Registration failed. Try again.");
+            }
+
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(window, "Database error: " + ex.getMessage());
+        }
     }
     
     public static void main(String[] args)
