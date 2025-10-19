@@ -7,7 +7,7 @@ import javax.swing.*;
 
 public class Dashboard
 {
-    private User currentUser;
+    public User currentUser;
 
     JFrame window = new JFrame("Clothing Inventory Management System");
     JPanel panel = new JPanel(new GridBagLayout());
@@ -65,7 +65,7 @@ public class Dashboard
         window.setVisible(true);
     }
     
-    private void handleLogin()
+    public void handleLogin()
     {
     	String username = usernameInput.getText().trim();
         String password = new String(passwordInput.getPassword());
@@ -108,7 +108,7 @@ public class Dashboard
         }
     }
     
-    private void handleRegister()
+    public void handleRegister()
     {
     	String username = usernameInput.getText().trim();
         String password = new String(passwordInput.getPassword());
