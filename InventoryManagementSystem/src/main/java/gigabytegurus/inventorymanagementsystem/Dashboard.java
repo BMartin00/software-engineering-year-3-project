@@ -58,4 +58,9 @@ public class Dashboard
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
     }
+    
+    public static void main(String[] args)
+	{
+	    new Dashboard();
+	}
 }
