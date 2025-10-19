@@ -1,6 +1,8 @@
 package gigabytegurus.inventorymanagementsystem;
 
 import java.awt.*;
+import java.sql.*;
+
 import javax.swing.*;
 
 public class Dashboard
@@ -65,7 +67,44 @@ public class Dashboard
     
     private void handleLogin()
     {
-    	
+    	String username = usernameInput.getText().trim();
+        String password = new String(passwordInput.getPassword());
+
+        if (username.isEmpty() || password.isEmpty())
+        {
+            JOptionPane.showMessageDialog(window, "Please enter username and password");
+            return;
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection())
+        {
+            String query = "SELECT * FROM users WHERE username=? AND password=?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                JOptionPane.showMessageDialog(window, "✅ Login Successful!");
+                currentUser = new User(
+                        rs.getInt("user_id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("role")
+                );
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(window, "❌ Invalid username or password");
+            }
+
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(window, "Database error: " + ex.getMessage());
+        }
     }
     
     private void handleRegister()
