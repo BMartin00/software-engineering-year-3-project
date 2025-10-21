@@ -2,8 +2,9 @@ package gigabytegurus.inventorymanagementsystem;
 
 import java.awt.*;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
-
 
 public class Dashboard
 {
@@ -165,6 +166,65 @@ public class Dashboard
 	    JFrame inventoryWindow = new JFrame("Inventory Dashboard");
 	    inventoryWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	    inventoryWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	
+	    List<Item> items = loadItemsFromDatabase();
+	
+	    String[] columns = {"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"};
+	    Object[][] data = new Object[items.size()][columns.length];
+	
+	    for (int i = 0; i < items.size(); i++)
+	    {
+	        Item item = items.get(i);
+	        data[i][0] = item.getItemId();
+	        data[i][1] = item.getName();
+	        data[i][2] = item.getCategory();
+	        data[i][3] = item.getSize();
+	        data[i][4] = item.getColour();
+	        data[i][5] = item.getQuantity();
+	        data[i][6] = item.getPrice();
+	        data[i][7] = item.getSupplier() != null ? item.getSupplier().getName() : "";
+	    }
+	
+	    JTable table = new JTable(data, columns)
+	    {
+	        @Override
+	        public boolean isCellEditable(int row, int column)
+	        {
+	            return false;
+	        }
+	    };
+	
+	    table.setFont(new Font("SansSerif", Font.PLAIN, 16));
+	    table.setRowHeight(30);
+	    table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 18));
+	
+	    JScrollPane scrollPane = new JScrollPane(table);
+	    scrollPane.setPreferredSize(new Dimension(900, 700));
+	
+	    JLabel title = new JLabel("Inventory List", SwingConstants.CENTER);
+	    title.setFont(new Font("SansSerif", Font.BOLD, 28));
+	
+	    JButton backButton = new JButton("Back to Login");
+	    backButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    backButton.addActionListener(e ->
+	    {
+	        inventoryWindow.dispose();
+	        window.setVisible(true);
+	    });
+	
+	    JPanel centerPanel = new JPanel();
+	    centerPanel.add(scrollPane);
+	    centerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 40, 40));
+	
+	    JPanel topPanel = new JPanel(new BorderLayout());
+	    topPanel.add(title, BorderLayout.CENTER);
+	
+	    JPanel bottomPanel = new JPanel();
+	    bottomPanel.add(backButton);
+	
+	    inventoryWindow.add(topPanel, BorderLayout.NORTH);
+	    inventoryWindow.add(centerPanel, BorderLayout.CENTER);
+	    inventoryWindow.add(bottomPanel, BorderLayout.SOUTH);
 	
 	    window.setVisible(false);
 	    inventoryWindow.setVisible(true);
