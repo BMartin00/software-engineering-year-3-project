@@ -230,6 +230,46 @@ public class Dashboard
 	    inventoryWindow.setVisible(true);
 	}
     
+    public List<Item> loadItemsFromDatabase()
+    {
+        List<Item> items = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection())
+        {
+            String query = "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+                    "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next())
+            {
+                Supplier supplier = null;
+                if (rs.getInt("supplier_id") != 0)
+                {
+                    supplier = new Supplier(rs.getInt("supplier_id"),
+                            rs.getString("supplierName"),
+                            rs.getString("supplierContact"));
+                }
+
+                items.add(new Item(
+                        rs.getInt("itemId"),
+                        rs.getString("itemName"),
+                        rs.getString("category"),
+                        rs.getString("size"),
+                        rs.getString("colour"),
+                        rs.getDouble("price"),
+                        rs.getInt("quantity"),
+                        supplier
+                ));
+            }
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(window, "Error loading items: " + ex.getMessage());
+        }
+        return items;
+    }
+    
     public static void main(String[] args)
 	{
 	    new Dashboard();
