@@ -225,10 +225,62 @@ public class Dashboard
 	    inventoryWindow.add(topPanel, BorderLayout.NORTH);
 	    inventoryWindow.add(centerPanel, BorderLayout.CENTER);
 	    inventoryWindow.add(bottomPanel, BorderLayout.SOUTH);
+	    
+	    
+	    
+	    
+	    
+	    
+	    // TEST BUTTON FOR ADD
+	    JButton addTestItemButton = new JButton("Add Test Item");
+	    addTestItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    addTestItemButton.addActionListener(e -> {
+	        try {
+	        	
+	            // sample supplier 
+	            Supplier supplier = new Supplier(1, "Test Supplier", "contact@test.com");
+
+	            // Create a test item
+	            Item testItem = new Item(
+	                (int)(Math.random() * 10000),  // random ID
+	                "Blue Hoodie",
+	                "Hoodies",
+	                "L",
+	                "Blue",
+	                29.99,
+	                15,
+	                supplier
+	            );
+
+	            // Add the item using your Inventory class
+	            Inventory inventory = new Inventory();
+	            inventory.addItem(testItem);
+
+	            JOptionPane.showMessageDialog(inventoryWindow,
+	                "✅ Test item added to the database!\n\nName: " + testItem.getName(),
+	                "Success", JOptionPane.INFORMATION_MESSAGE);
+	            
+	          
+
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(inventoryWindow,
+	                "❌ Error adding test item: " + ex.getMessage(),
+	                "Error", JOptionPane.ERROR_MESSAGE);
+	        }
+	    });
+
+	    // new button to existing bottomPanel
+	    bottomPanel.add(addTestItemButton);
+
 	
 	    window.setVisible(false);
 	    inventoryWindow.setVisible(true);
 	}
+    
+    
+    
+    
     
     public List<Item> loadItemsFromDatabase()
     {
