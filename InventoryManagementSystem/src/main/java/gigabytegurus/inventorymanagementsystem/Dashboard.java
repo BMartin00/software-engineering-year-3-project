@@ -231,7 +231,7 @@ public class Dashboard
 	    
 	    
 	    
-	    // TEST BUTTON FOR ADD
+	    // TEST BUTTON FOR ADD ITEM
 	    JButton addTestItemButton = new JButton("Add Test Item");
 	    addTestItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 	    addTestItemButton.addActionListener(e -> {

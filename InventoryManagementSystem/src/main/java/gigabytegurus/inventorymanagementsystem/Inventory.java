@@ -20,7 +20,7 @@ public class Inventory
 	        items.add(item);
 	    }
 
-	    // Save to database
+	    // Save to Database
 	    try (Connection conn = DatabaseConnection.getConnection())
 	    {
 	        String sql = "INSERT INTO items (itemId, itemName, category, size, colour, price, quantity, supplier_id) " +
