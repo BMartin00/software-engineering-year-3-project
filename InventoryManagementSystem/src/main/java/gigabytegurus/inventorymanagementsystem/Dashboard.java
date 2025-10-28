@@ -5,6 +5,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class Dashboard
 {
@@ -161,6 +162,9 @@ public class Dashboard
         }
     }
     
+    
+    
+    
     public void openInventoryWindow()
     {
 	    JFrame inventoryWindow = new JFrame("Inventory Dashboard");
@@ -230,50 +234,120 @@ public class Dashboard
 	    
 	    
 	    
+	    // ADD
+	    JButton addItemButton = new JButton("Add New Item");
+	    addItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 	    
-	    // TEST BUTTON FOR ADD ITEM
-	    JButton addTestItemButton = new JButton("Add Test Item");
-	    addTestItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
-	    addTestItemButton.addActionListener(e -> {
-	        try {
-	        	
-	            // sample supplier 
-	            Supplier supplier = new Supplier(1, "Test Supplier", "contact@test.com");
+	    
+	    // When the button is clicked, open a popup form for user input
+	    addItemButton.addActionListener(e -> {
+	    	
+	    	// Create text fields for each clothing attribute
+	        JTextField nameField = new JTextField(15);
+	        JTextField categoryField = new JTextField(15);
+	        JTextField sizeField = new JTextField(10);
+	        JTextField colourField = new JTextField(10);
+	        JTextField priceField = new JTextField(10);
+	        JTextField quantityField = new JTextField(10);
 
-	            // Create a test item
-	            Item testItem = new Item(
-	                (int)(Math.random() * 10000),  // random ID
-	                "Blue Hoodie",
-	                "Hoodies",
-	                "L",
-	                "Blue",
-	                29.99,
-	                15,
-	                supplier
-	            );
+	        
+	        // Build a small input form panel with labels and text fields
+	        JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
+	        panel.add(new JLabel("Item Name:"));
+	        panel.add(nameField);
+	        panel.add(new JLabel("Category:"));
+	        panel.add(categoryField);
+	        panel.add(new JLabel("Size:"));
+	        panel.add(sizeField);
+	        panel.add(new JLabel("Colour:"));
+	        panel.add(colourField);
+	        panel.add(new JLabel("Price (€):"));
+	        panel.add(priceField);
+	        panel.add(new JLabel("Quantity:"));
+	        panel.add(quantityField);
 
-	            // Add the item using your Inventory class
-	            Inventory inventory = new Inventory();
-	            inventory.addItem(testItem);
+	        
+	        // Display the form inside a dialog box for user input
+	        int result = JOptionPane.showConfirmDialog(
+	                inventoryWindow, panel,
+	                "Add New Item", JOptionPane.OK_CANCEL_OPTION,
+	                JOptionPane.PLAIN_MESSAGE);
 
-	            JOptionPane.showMessageDialog(inventoryWindow,
-	                "✅ Test item added to the database!\n\nName: " + testItem.getName(),
-	                "Success", JOptionPane.INFORMATION_MESSAGE);
-	            
-	          
+	        
+	        // If the user presses OK, attempt to add the item
+	        if (result == JOptionPane.OK_OPTION) {
+	            try {
+	                String name = nameField.getText().trim();
+	                String category = categoryField.getText().trim();
+	                String size = sizeField.getText().trim();
+	                String colour = colourField.getText().trim();
+	                double price = Double.parseDouble(priceField.getText().trim());
+	                int quantity = Integer.parseInt(quantityField.getText().trim());
+	                
+	                
+	                // Default supplier for now
+	                Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
 
-	        } catch (Exception ex) {
-	            ex.printStackTrace();
-	            JOptionPane.showMessageDialog(inventoryWindow,
-	                "❌ Error adding test item: " + ex.getMessage(),
-	                "Error", JOptionPane.ERROR_MESSAGE);
+	                
+	                
+	                // Create a new Item object
+	                Item newItem = new Item(
+	                    0, // placeholder only, DB handles real ID
+	                    name, category, size, colour,
+	                    price, quantity, supplier
+	                );
+
+	                
+	                // Add the new item to the database using the Inventory class
+	                Inventory inventory = new Inventory();
+	                inventory.addItem(newItem);
+
+	                
+	                // Confirm success to the user
+	                JOptionPane.showMessageDialog(inventoryWindow,
+	                        "✅ Item added successfully!\nName: " + name,
+	                        "Success", JOptionPane.INFORMATION_MESSAGE);
+
+	                //  Refresh the table to immediately show the new item
+	                List<Item> updatedItems = loadItemsFromDatabase();
+	                DefaultTableModel model = new DefaultTableModel(
+	                        new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0);
+
+	                
+	                // Rebuild the table data with the updated inventory
+	                for (Item item : updatedItems) {
+	                    model.addRow(new Object[]{
+	                        item.getItemId(),
+	                        item.getName(),
+	                        item.getCategory(),
+	                        item.getSize(),
+	                        item.getColour(),
+	                        item.getQuantity(),
+	                        item.getPrice(),
+	                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+	                    });
+	                }
+	                
+	                // Apply the new data model to the table to update the UI
+	                table.setModel(model);
+
+	            } catch (Exception ex) {
+	                ex.printStackTrace();
+	                JOptionPane.showMessageDialog(inventoryWindow,
+	                        "❌ Error adding item: " + ex.getMessage(),
+	                        "Error", JOptionPane.ERROR_MESSAGE);
+	            }
 	        }
 	    });
 
-	    // new button to existing bottomPanel
-	    bottomPanel.add(addTestItemButton);
+	    // Add the new "Add Item" button next to the "Back to Login" button
+	    bottomPanel.add(addItemButton);
+	    
+	    // Refresh the bottom panel so the new button appears right away
+	    bottomPanel.revalidate();
+	    bottomPanel.repaint();
 
-	
+	    // Hide the login window and show the inventory dashboard
 	    window.setVisible(false);
 	    inventoryWindow.setVisible(true);
 	}

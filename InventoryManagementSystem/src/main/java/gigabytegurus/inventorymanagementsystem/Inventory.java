@@ -21,27 +21,35 @@ public class Inventory
 	    }
 
 	    // Save to Database
+	    // This permanently stores the new item in the "items" table.
 	    try (Connection conn = DatabaseConnection.getConnection())
 	    {
-	        String sql = "INSERT INTO items (itemId, itemName, category, size, colour, price, quantity, supplier_id) " +
-	                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	        
+	    	// SQL query to insert a new item into the database
+	        // The "itemId" column is omitted because it’s auto-generated.
+	        String sql = "INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_id) " +
+	                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+	        
+	        // Create a prepared statement to safely insert data (prevents SQL injection)
 	        PreparedStatement stmt = conn.prepareStatement(sql);
-	        stmt.setInt(1, item.getItemId());
-	        stmt.setString(2, item.getName());
-	        stmt.setString(3, item.getCategory());
-	        stmt.setString(4, item.getSize());
-	        stmt.setString(5, item.getColour());
-	        stmt.setDouble(6, item.getPrice());
-	        stmt.setInt(7, item.getQuantity());
 	        
+	        stmt.setString(1, item.getName());
+	        stmt.setString(2, item.getCategory());
+	        stmt.setString(3, item.getSize());
+	        stmt.setString(4, item.getColour());
+	        stmt.setDouble(5, item.getPrice());
+	        stmt.setInt(6, item.getQuantity());
+
 	        
+	        // If the item has an associated supplier, save its ID
+	        // Otherwise, insert NULL for the supplier_id column
 	        if (item.getSupplier() != null)
 	        {
-	            stmt.setInt(8, item.getSupplier().getSupplierId());
+	            stmt.setInt(7, item.getSupplier().getSupplierId());
 	        }
 	        else
 	        {
-	            stmt.setNull(8, java.sql.Types.INTEGER);
+	            stmt.setNull(7, java.sql.Types.INTEGER);
 	        }
 
 	        stmt.executeUpdate();
@@ -66,6 +74,10 @@ public class Inventory
 	{
 		
 	}
+	
+	
+	
+	
 	
 	public List<Item> searchItem(String keyword)
 	{
