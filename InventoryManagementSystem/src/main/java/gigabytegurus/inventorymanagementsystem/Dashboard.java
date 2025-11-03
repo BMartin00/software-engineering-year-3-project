@@ -305,7 +305,7 @@ public class Dashboard
 	                
 	                // Confirm success to the user
 	                JOptionPane.showMessageDialog(inventoryWindow,
-	                        "✅ Item added successfully!\nName: " + name,
+	                        "Item added successfully!\nName: " + name,
 	                        "Success", JOptionPane.INFORMATION_MESSAGE);
 
 	                //  Refresh the table to immediately show the new item
@@ -334,7 +334,7 @@ public class Dashboard
 	            } catch (Exception ex) {
 	                ex.printStackTrace();
 	                JOptionPane.showMessageDialog(inventoryWindow,
-	                        "❌ Error adding item: " + ex.getMessage(),
+	                        "Error adding item: " + ex.getMessage(),
 	                        "Error", JOptionPane.ERROR_MESSAGE);
 	            }
 	        }
@@ -343,14 +343,82 @@ public class Dashboard
 	    // Add the new "Add Item" button next to the "Back to Login" button
 	    bottomPanel.add(addItemButton);
 	    
-	    // Refresh the bottom panel so the new button appears right away
-	    bottomPanel.revalidate();
-	    bottomPanel.repaint();
-
+	    
 	    // Hide the login window and show the inventory dashboard
 	    window.setVisible(false);
 	    inventoryWindow.setVisible(true);
-	}
+	    
+	    
+	    
+	    // EDIT ITEM BUTTON — allows the user to update an existing record
+	    JButton editItemButton = new JButton("Edit Item");
+	    editItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+
+	    // When the button is clicked, the program asks which item the user wants to edit
+	    editItemButton.addActionListener(e -> {
+	        try {
+	            // Ask the user which item they want to edit
+	            // Opens a small popup where the user enters the item ID number
+	            String idInput = JOptionPane.showInputDialog(inventoryWindow, "Enter the ID of the item you want to edit:");
+	            
+	            // If the user presses Cancel or leaves it blank, stop the process
+	            if (idInput == null || idInput.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No ID entered. Edit cancelled.");
+	                return; // exit the event handler
+	            }
+
+	            // Convert the entered text into an integer (the item ID)
+	            // Throws NumberFormatException if the user typed something invalid (like letters)
+	            int itemId = Integer.parseInt(idInput.trim());
+
+	            // Create a new Inventory object and call the updateItem() method
+	            // This method opens a popup where the user can edit item details
+	            Inventory inventory = new Inventory();
+	            inventory.updateItem(itemId);
+
+	            // After updating, reload the table to show the new data
+	            // Fetch the updated list of items from the database
+	            List<Item> updatedItems = loadItemsFromDatabase();
+
+	            // Rebuild the table model using the new inventory data
+	            DefaultTableModel model = new DefaultTableModel(
+	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0);
+
+	            // Add each item as a new row in the table
+	            for (Item item : updatedItems) {
+	                model.addRow(new Object[]{
+	                    item.getItemId(),
+	                    item.getName(),
+	                    item.getCategory(),
+	                    item.getSize(),
+	                    item.getColour(),
+	                    item.getQuantity(),
+	                    item.getPrice(),
+	                    item.getSupplier() != null ? item.getSupplier().getName() : ""
+	                });
+	            }
+
+	            // Apply the new data to the table to update the display
+	            table.setModel(model);
+
+	        } 
+	        // Handle invalid input (non-number ID)
+	        catch (NumberFormatException ex) {
+	            JOptionPane.showMessageDialog(inventoryWindow, "Invalid ID format. Please enter a number.");
+	        } 
+	        //  Handle other unexpected errors
+	        catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(inventoryWindow, "Error updating item: " + ex.getMessage());
+	        }
+	    });
+
+	    // Add the Edit Item button to the bottom panel alongside the buttons
+	    bottomPanel.add(editItemButton);
+
+	    
+    }
+
     
     
     
