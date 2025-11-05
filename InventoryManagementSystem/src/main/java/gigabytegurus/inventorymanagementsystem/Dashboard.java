@@ -230,7 +230,11 @@ public class Dashboard
 	    inventoryWindow.add(centerPanel, BorderLayout.CENTER);
 	    inventoryWindow.add(bottomPanel, BorderLayout.SOUTH);
 	    
-	    
+	 // ✅ Add the Filter Items button at the end
+	    JButton filterButton = new JButton("Filter Items");
+	    filterButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    bottomPanel.add(filterButton);
+
 	    
 	    
 	    
@@ -348,6 +352,99 @@ public class Dashboard
 	    window.setVisible(false);
 	    inventoryWindow.setVisible(true);
 	    
+	 // ✅ Filter Button Logic
+	    filterButton.addActionListener(e -> {
+	        try {
+	            JTextField categoryField = new JTextField(10);
+	            JTextField sizeField = new JTextField(10);
+	            JTextField supplierField = new JTextField(10);
+
+	            JPanel filterPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+	            filterPanel.add(new JLabel("Category:"));
+	            filterPanel.add(categoryField);
+	            filterPanel.add(new JLabel("Size:"));
+	            filterPanel.add(sizeField);
+	            filterPanel.add(new JLabel("Supplier:"));
+	            filterPanel.add(supplierField);
+
+	            int result = JOptionPane.showConfirmDialog(
+	                    inventoryWindow, filterPanel,
+	                    "Filter Items", JOptionPane.OK_CANCEL_OPTION,
+	                    JOptionPane.PLAIN_MESSAGE);
+
+	            if (result == JOptionPane.OK_OPTION) {
+	                String category = categoryField.getText().trim();
+	                String size = sizeField.getText().trim();
+	                String supplier = supplierField.getText().trim();
+
+	                List<Item> filteredItems = new ArrayList<>();
+
+	                try (Connection conn = DatabaseConnection.getConnection()) {
+	                    StringBuilder query = new StringBuilder(
+	                        "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+	                        "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id WHERE 1=1"
+	                    );
+
+	                    if (!category.isEmpty()) query.append(" AND i.category LIKE ?");
+	                    if (!size.isEmpty()) query.append(" AND i.size LIKE ?");
+	                    if (!supplier.isEmpty()) query.append(" AND s.name LIKE ?");
+
+	                    PreparedStatement stmt = conn.prepareStatement(query.toString());
+	                    int index = 1;
+	                    if (!category.isEmpty()) stmt.setString(index++, "%" + category + "%");
+	                    if (!size.isEmpty()) stmt.setString(index++, "%" + size + "%");
+	                    if (!supplier.isEmpty()) stmt.setString(index++, "%" + supplier + "%");
+
+	                    ResultSet rs = stmt.executeQuery();
+	                    while (rs.next()) {
+	                        Supplier sup = null;
+	                        if (rs.getInt("supplier_id") != 0) {
+	                            sup = new Supplier(
+	                                rs.getInt("supplier_id"),
+	                                rs.getString("supplierName"),
+	                                rs.getString("supplierContact")
+	                            );
+	                        }
+	                        filteredItems.add(new Item(
+	                            rs.getInt("itemId"),
+	                            rs.getString("itemName"),
+	                            rs.getString("category"),
+	                            rs.getString("size"),
+	                            rs.getString("colour"),
+	                            rs.getDouble("price"),
+	                            rs.getInt("quantity"),
+	                            sup
+	                        ));
+	                    }
+	                }
+
+	                // Update table
+	                DefaultTableModel model = new DefaultTableModel(
+	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0);
+
+	                for (Item item : filteredItems) {
+	                    model.addRow(new Object[]{
+	                        item.getItemId(),
+	                        item.getName(),
+	                        item.getCategory(),
+	                        item.getSize(),
+	                        item.getColour(),
+	                        item.getQuantity(),
+	                        item.getPrice(),
+	                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+	                    });
+	                }
+
+	                table.setModel(model);
+	                highlightLowStock(table);
+	            }
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(inventoryWindow, "Error filtering items: " + ex.getMessage());
+	        }
+	    });
+
+	    
 	    
 	    
 	    // EDIT ITEM BUTTON — allows the user to update an existing record
@@ -464,6 +561,36 @@ public class Dashboard
         return items;
     }
     
+    private void highlightLowStock(JTable table) {
+        table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+                Component c = super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, column);
+                int quantityColumn = 5; // ✅ Correct column index for "Quantity"
+
+                try {
+                    int qty = Integer.parseInt(tbl.getValueAt(row, quantityColumn).toString());
+                    if (qty < 20) { // ✅ Highlight if quantity < 20
+                        c.setBackground(new Color(255, 102, 102)); // Bright red shade for low stock
+                    } else {
+                        c.setBackground(Color.WHITE);
+                    }
+                } catch (Exception e) {
+                    c.setBackground(Color.WHITE);
+                }
+
+                if (isSelected) {
+                    c.setBackground(new Color(184, 207, 229)); // keep selection highlight
+                }
+
+                return c;
+            }
+        });
+    }
+
+
     public static void main(String[] args)
 	{
 	    new Dashboard();

@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -201,18 +202,36 @@ public class Inventory
 		return items;
 	}
 	
-	public List<Item> filterItems(String category, String size, String colour)
-	{
-		return items;
-	}
+	public List<Item> filterItems(String category, String size, String brand) {
+        List<Item> filtered = new ArrayList<>();
+        if (items == null) return filtered;
+        
+        for (Item item : items) { // use in-memory list
+            boolean matchesCategory = category.equals("All Categories") || item.getCategory().equals(category);
+            boolean matchesSize = size.equals("All Sizes") || item.getSize().equals(size);
+            boolean matchesBrand = brand.equals("All Brands") || 
+                    (item.getSupplier() != null && item.getSupplier().getName().equals(brand));
+            if (matchesCategory && matchesSize && matchesBrand) {
+                filtered.add(item);
+            }
+        }
+        return filtered;
+    }
+
+    public List<Item> getLowStockItems() {
+        List<Item> lowStock = new ArrayList<>();
+        if (items == null) return lowStock;
+        
+        for (Item item : items) { 
+            if (item.getQuantity() < 20) { 
+                lowStock.add(item);
+            }
+        }
+        return lowStock;
+    }
 	
 	public Report generateReport(String format)
 	{
 		return null;
-	}
-	
-	public List<Item> getLowStockItems()
-	{
-		return items;
 	}
 }
