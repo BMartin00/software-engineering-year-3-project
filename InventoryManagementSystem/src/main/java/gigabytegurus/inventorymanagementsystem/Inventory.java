@@ -286,13 +286,16 @@ public class Inventory
        
     }
     
-    
-	
 	public Report generateReport(String format)
 	{
 		return null;
 	}
 }
+
+    
+    
+	
+
 
 
 
