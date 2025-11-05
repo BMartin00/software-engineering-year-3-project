@@ -230,14 +230,6 @@ public class Dashboard
 	    inventoryWindow.add(centerPanel, BorderLayout.CENTER);
 	    inventoryWindow.add(bottomPanel, BorderLayout.SOUTH);
 	    
-	 // ✅ Add the Filter Items button at the end
-	    JButton filterButton = new JButton("Filter Items");
-	    filterButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
-	    bottomPanel.add(filterButton);
-
-	    
-	    
-	    
 	    // ADD
 	    JButton addItemButton = new JButton("Add New Item");
 	    addItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
@@ -351,102 +343,7 @@ public class Dashboard
 	    // Hide the login window and show the inventory dashboard
 	    window.setVisible(false);
 	    inventoryWindow.setVisible(true);
-	    
-	 // ✅ Filter Button Logic
-	    filterButton.addActionListener(e -> {
-	        try {
-	            JTextField categoryField = new JTextField(10);
-	            JTextField sizeField = new JTextField(10);
-	            JTextField supplierField = new JTextField(10);
-
-	            JPanel filterPanel = new JPanel(new GridLayout(0, 2, 10, 10));
-	            filterPanel.add(new JLabel("Category:"));
-	            filterPanel.add(categoryField);
-	            filterPanel.add(new JLabel("Size:"));
-	            filterPanel.add(sizeField);
-	            filterPanel.add(new JLabel("Supplier:"));
-	            filterPanel.add(supplierField);
-
-	            int result = JOptionPane.showConfirmDialog(
-	                    inventoryWindow, filterPanel,
-	                    "Filter Items", JOptionPane.OK_CANCEL_OPTION,
-	                    JOptionPane.PLAIN_MESSAGE);
-
-	            if (result == JOptionPane.OK_OPTION) {
-	                String category = categoryField.getText().trim();
-	                String size = sizeField.getText().trim();
-	                String supplier = supplierField.getText().trim();
-
-	                List<Item> filteredItems = new ArrayList<>();
-
-	                try (Connection conn = DatabaseConnection.getConnection()) {
-	                    StringBuilder query = new StringBuilder(
-	                        "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
-	                        "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id WHERE 1=1"
-	                    );
-
-	                    if (!category.isEmpty()) query.append(" AND i.category LIKE ?");
-	                    if (!size.isEmpty()) query.append(" AND i.size LIKE ?");
-	                    if (!supplier.isEmpty()) query.append(" AND s.name LIKE ?");
-
-	                    PreparedStatement stmt = conn.prepareStatement(query.toString());
-	                    int index = 1;
-	                    if (!category.isEmpty()) stmt.setString(index++, "%" + category + "%");
-	                    if (!size.isEmpty()) stmt.setString(index++, "%" + size + "%");
-	                    if (!supplier.isEmpty()) stmt.setString(index++, "%" + supplier + "%");
-
-	                    ResultSet rs = stmt.executeQuery();
-	                    while (rs.next()) {
-	                        Supplier sup = null;
-	                        if (rs.getInt("supplier_id") != 0) {
-	                            sup = new Supplier(
-	                                rs.getInt("supplier_id"),
-	                                rs.getString("supplierName"),
-	                                rs.getString("supplierContact")
-	                            );
-	                        }
-	                        filteredItems.add(new Item(
-	                            rs.getInt("itemId"),
-	                            rs.getString("itemName"),
-	                            rs.getString("category"),
-	                            rs.getString("size"),
-	                            rs.getString("colour"),
-	                            rs.getDouble("price"),
-	                            rs.getInt("quantity"),
-	                            sup
-	                        ));
-	                    }
-	                }
-
-	                // Update table
-	                DefaultTableModel model = new DefaultTableModel(
-	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0);
-
-	                for (Item item : filteredItems) {
-	                    model.addRow(new Object[]{
-	                        item.getItemId(),
-	                        item.getName(),
-	                        item.getCategory(),
-	                        item.getSize(),
-	                        item.getColour(),
-	                        item.getQuantity(),
-	                        item.getPrice(),
-	                        item.getSupplier() != null ? item.getSupplier().getName() : ""
-	                    });
-	                }
-
-	                table.setModel(model);
-	                highlightLowStock(table);
-	            }
-	        } catch (Exception ex) {
-	            ex.printStackTrace();
-	            JOptionPane.showMessageDialog(inventoryWindow, "Error filtering items: " + ex.getMessage());
-	        }
-	    });
-
-	    
-	    
-	    
+	  
 	    // EDIT ITEM BUTTON — allows the user to update an existing record
 	    JButton editItemButton = new JButton("Edit Item");
 	    editItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
@@ -512,13 +409,201 @@ public class Dashboard
 
 	    // Add the Edit Item button to the bottom panel alongside the buttons
 	    bottomPanel.add(editItemButton);
-
 	    
-    }
+	 // DELETE BUTTON
+	    JButton deleteButton = new JButton("Delete");
+	    deleteButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 
-    
-    
-    
+	    deleteButton.addActionListener(e -> {
+	        try {
+	            // Ask user for the item ID to delete
+	            String idInput = JOptionPane.showInputDialog(
+	                inventoryWindow, 
+	                "Enter the ID of the item you want to delete:",
+	                "Delete Item",
+	                JOptionPane.QUESTION_MESSAGE
+	            );
+	            
+	            if (idInput == null || idInput.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No ID entered. Deletion cancelled.");
+	                return;
+	            }
+
+	            int itemId = Integer.parseInt(idInput.trim());
+	            
+	            // Create inventory instance and remove the item
+	            Inventory inventory = new Inventory();
+	            inventory.removeItem(itemId);
+
+	            // Refresh the table to show updated inventory
+	            List<Item> updatedItems = loadItemsFromDatabase();
+	            DefaultTableModel model = new DefaultTableModel(
+	                new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+	            );
+
+	            for (Item item : updatedItems) {
+	                model.addRow(new Object[]{
+	                    item.getItemId(),
+	                    item.getName(),
+	                    item.getCategory(),
+	                    item.getSize(),
+	                    item.getColour(),
+	                    item.getQuantity(),
+	                    item.getPrice(),
+	                    item.getSupplier() != null ? item.getSupplier().getName() : ""
+	                });
+	            }
+
+	            table.setModel(model);
+	            highlightLowStock(table); 
+
+	        } catch (NumberFormatException ex) {
+	            JOptionPane.showMessageDialog(inventoryWindow, "Invalid ID format. Please enter a valid number.");
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(inventoryWindow, "Error deleting item: " + ex.getMessage());
+	        }
+	    });
+
+	    // Add the delete button to the bottom panel
+	    bottomPanel.add(deleteButton);
+	    
+	    //Filter 
+	    JButton filterButton = new JButton("Filter Items");
+	    filterButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    bottomPanel.add(filterButton);
+
+	    // Highlight low stock when the window opens
+	    highlightLowStock(table);
+
+	    // Filter Button Logic
+	    filterButton.addActionListener(e -> {
+	        try {
+	            JTextField categoryField = new JTextField(10);
+	            JTextField sizeField = new JTextField(10);
+	            JTextField supplierField = new JTextField(10);
+
+	            JPanel filterPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+	            filterPanel.add(new JLabel("Category:"));
+	            filterPanel.add(categoryField);
+	            filterPanel.add(new JLabel("Size:"));
+	            filterPanel.add(sizeField);
+	            filterPanel.add(new JLabel("Supplier:"));
+	            filterPanel.add(supplierField);
+
+	            int result = JOptionPane.showConfirmDialog(
+	                    inventoryWindow, filterPanel,
+	                    "Filter Items", JOptionPane.OK_CANCEL_OPTION,
+	                    JOptionPane.PLAIN_MESSAGE);
+
+	            if (result == JOptionPane.OK_OPTION) {
+	                String category = categoryField.getText().trim();
+	                String size = sizeField.getText().trim();
+	                String supplier = supplierField.getText().trim();
+
+	                List<Item> filteredItems = new ArrayList<>();
+
+	                try (Connection conn = DatabaseConnection.getConnection()) {
+	                    StringBuilder query = new StringBuilder(
+	                        "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+	                        "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id WHERE 1=1"
+	                    );
+
+	                    if (!category.isEmpty()) query.append(" AND i.category LIKE ?");
+	                    if (!size.isEmpty()) query.append(" AND i.size LIKE ?");
+	                    if (!supplier.isEmpty()) query.append(" AND s.name LIKE ?");
+
+	                    PreparedStatement stmt = conn.prepareStatement(query.toString());
+	                    int index = 1;
+	                    if (!category.isEmpty()) stmt.setString(index++, "%" + category + "%");
+	                    if (!size.isEmpty()) stmt.setString(index++, "%" + size + "%");
+	                    if (!supplier.isEmpty()) stmt.setString(index++, "%" + supplier + "%");
+
+	                    ResultSet rs = stmt.executeQuery();
+	                    while (rs.next()) {
+	                        Supplier sup = null;
+	                        if (rs.getInt("supplier_id") != 0) {
+	                            sup = new Supplier(
+	                                rs.getInt("supplier_id"),
+	                                rs.getString("supplierName"),
+	                                rs.getString("supplierContact")
+	                            );
+	                        }
+	                        filteredItems.add(new Item(
+	                            rs.getInt("itemId"),
+	                            rs.getString("itemName"),
+	                            rs.getString("category"),
+	                            rs.getString("size"),
+	                            rs.getString("colour"),
+	                            rs.getDouble("price"),
+	                            rs.getInt("quantity"),
+	                            sup
+	                        ));
+	                    }
+	                }
+
+	                DefaultTableModel model = new DefaultTableModel(
+	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0);
+
+	                for (Item item : filteredItems) {
+	                    model.addRow(new Object[]{
+	                        item.getItemId(),
+	                        item.getName(),
+	                        item.getCategory(),
+	                        item.getSize(),
+	                        item.getColour(),
+	                        item.getQuantity(),
+	                        item.getPrice(),
+	                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+	                    });
+	                }
+
+	                table.setModel(model);
+	                highlightLowStock(table); 
+	            }
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(inventoryWindow, "Error filtering items: " + ex.getMessage());
+	        }
+	    });
+    }
+    private void highlightLowStock(JTable table) {
+        // Set a custom cell for all cells in the table
+        table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+                // Get the default rendering behavior for the cell
+                Component c = super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, column);
+
+                int quantityColumn = 5;
+                try {
+                    // Try to read the quantity value from the current row
+                    int qty = Integer.parseInt(tbl.getValueAt(row, quantityColumn).toString());
+                    
+                    // If quantity < 20  highlight the row in light red low stock warning
+                    if (qty < 20) {
+                        c.setBackground(new Color(255, 102, 102)); 
+                    } else {
+                        c.setBackground(Color.WHITE);
+                    }
+                } catch (Exception e) {
+                    // If something goes wrong  keep white
+                    c.setBackground(Color.WHITE);
+                }
+
+                // If the row is selected by the user, use the standard color 
+                if (isSelected) {
+                    c.setBackground(new Color(184, 207, 229)); // Light blue
+                }
+
+                // Return the modified cell component to display
+                return c;
+            }
+        });
+    }
     
     
     public List<Item> loadItemsFromDatabase()
@@ -561,36 +646,6 @@ public class Dashboard
         return items;
     }
     
-    private void highlightLowStock(JTable table) {
-        table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(
-                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-
-                Component c = super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, column);
-                int quantityColumn = 5; // ✅ Correct column index for "Quantity"
-
-                try {
-                    int qty = Integer.parseInt(tbl.getValueAt(row, quantityColumn).toString());
-                    if (qty < 20) { // ✅ Highlight if quantity < 20
-                        c.setBackground(new Color(255, 102, 102)); // Bright red shade for low stock
-                    } else {
-                        c.setBackground(Color.WHITE);
-                    }
-                } catch (Exception e) {
-                    c.setBackground(Color.WHITE);
-                }
-
-                if (isSelected) {
-                    c.setBackground(new Color(184, 207, 229)); // keep selection highlight
-                }
-
-                return c;
-            }
-        });
-    }
-
-
     public static void main(String[] args)
 	{
 	    new Dashboard();
