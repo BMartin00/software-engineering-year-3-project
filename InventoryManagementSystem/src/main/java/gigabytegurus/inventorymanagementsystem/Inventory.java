@@ -252,6 +252,11 @@ public class Inventory
 		return items;
 	}
 	
+	
+	
+	
+	
+	
 	public List<Item> filterItems(String category, String size, String colour) {
         List<Item> filtered = new ArrayList<>();
         if (items == null) return filtered;
@@ -278,11 +283,15 @@ public class Inventory
             }
         }
         return lowStock;
+       
     }
+    
+    
 	
 	public Report generateReport(String format)
 	{
 		return null;
 	}
 }
+
 
