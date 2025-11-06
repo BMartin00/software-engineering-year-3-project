@@ -23,9 +23,34 @@ public class Inventory
 	public void addItem(Item item)
 	{
 		
-		if (item.getName() == null || item.getName().trim().isEmpty()) {
+		
+		//VALIDATION CHECKS FOR JUNIT TESTS ON ADD
+		if (item == null) {
+	        throw new IllegalArgumentException("Item cannot be null.");
+	    }
+	    if (item.getName() == null || item.getName().trim().isEmpty()) {
 	        throw new IllegalArgumentException("Item name cannot be empty.");
 	    }
+	    if (item.getPrice() < 0) {
+	        throw new IllegalArgumentException("Price cannot be negative.");
+	    }
+	    if (item.getQuantity() < 0) {
+	        throw new IllegalArgumentException("Quantity cannot be negative.");
+	    }
+	    if (item.getCategory() == null || item.getCategory().trim().isEmpty()) {
+	        throw new IllegalArgumentException("Category cannot be empty.");
+	    }
+	    if (item.getColour() == null || item.getColour().trim().isEmpty()) {
+	        throw new IllegalArgumentException("Colour cannot be empty.");
+	    }
+	    if (item.getSize() == null || item.getSize().trim().isEmpty()) {
+	        throw new IllegalArgumentException("Size cannot be empty.");
+	    }
+
+	    if (items != null) {
+	        items.add(item);
+	    }
+	    
 
 	    // Save to Database
 	    // This permanently stores the new item in the "items" table.
