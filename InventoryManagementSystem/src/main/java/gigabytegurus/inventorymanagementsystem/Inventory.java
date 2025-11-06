@@ -22,10 +22,9 @@ public class Inventory
 	
 	public void addItem(Item item)
 	{
-		// Add to in-memory list
-	    if (items != null)
-	    {
-	        items.add(item);
+		
+		if (item.getName() == null || item.getName().trim().isEmpty()) {
+	        throw new IllegalArgumentException("Item name cannot be empty.");
 	    }
 
 	    // Save to Database
