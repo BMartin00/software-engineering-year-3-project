@@ -17,6 +17,8 @@ public class Inventory
 {
 	private List<Item> items;
 	
+	public boolean testMode = false;
+	
 	
 	
 	
@@ -112,66 +114,92 @@ public class Inventory
 
 	        // If no record matches the given ID, tell the user and stop
 	        if (!rs.next()) {
-	            JOptionPane.showMessageDialog(null, "⚠️ No item found with ID: " + itemId);
+	            if (!testMode) JOptionPane.showMessageDialog(null, "⚠No item found with ID: " + itemId);
 	            selectStmt.close();
 	            return;
 	        }
 
-	        // Fill the text fields with the current values so the user can see and edit them
-	        JTextField nameField = new JTextField(rs.getString("itemName"), 15);
-	        JTextField categoryField = new JTextField(rs.getString("category"), 15);
-	        JTextField sizeField = new JTextField(rs.getString("size"), 10);
-	        JTextField colourField = new JTextField(rs.getString("colour"), 10);
-	        JTextField priceField = new JTextField(String.valueOf(rs.getDouble("price")), 10);
-	        JTextField quantityField = new JTextField(String.valueOf(rs.getInt("quantity")), 10);
-
-	        // Build a small form with all of the input fields
-	        JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
-	        panel.add(new JLabel("Item Name:"));
-	        panel.add(nameField);
-	        panel.add(new JLabel("Category:"));
-	        panel.add(categoryField);
-	        panel.add(new JLabel("Size:"));
-	        panel.add(sizeField);
-	        panel.add(new JLabel("Colour:"));
-	        panel.add(colourField);
-	        panel.add(new JLabel("Price (€):"));
-	        panel.add(priceField);
-	        panel.add(new JLabel("Quantity:"));
-	        panel.add(quantityField);
-
-	        // Show the form to the user
-	        int result = JOptionPane.showConfirmDialog(
-	                null, panel,
-	                "Edit Item (ID: " + itemId + ")", JOptionPane.OK_CANCEL_OPTION,
-	                JOptionPane.PLAIN_MESSAGE);
-
-	        // If the user cancels or closes the dialog, stop here
-	        if (result != JOptionPane.OK_OPTION) {
-	            JOptionPane.showMessageDialog(null, "Edit cancelled. No changes were made.");
-	            rs.close();
-	            selectStmt.close();
-	            return;
-	        }
-
-	        // Read the values that the user entered and remove spaces
-	        String name = nameField.getText().trim();
-	        String category = categoryField.getText().trim();
-	        String size = sizeField.getText().trim();
-	        String colour = colourField.getText().trim();
+	        // Variables used in both GUI mode and test mode
+	        String name, category, size, colour;
 	        double price;
 	        int quantity;
 
-	        // Try converting price and quantity to numbers; stop if it fails
-	        try {
-	            price = Double.parseDouble(priceField.getText().trim());
-	            quantity = Integer.parseInt(quantityField.getText().trim());
-	        } catch (NumberFormatException ex) {
-	            JOptionPane.showMessageDialog(null, "Invalid number format for price or quantity.");
-	            rs.close();
-	            selectStmt.close();
-	            return;
+	        // Fill the text fields with the current values so the user can see and edit them
+	        // If NOT test mode  show the input GUI normally
+	        if (!testMode) {
+
+	            JTextField nameField = new JTextField(rs.getString("itemName"), 15);
+	            JTextField categoryField = new JTextField(rs.getString("category"), 15);
+	            JTextField sizeField = new JTextField(rs.getString("size"), 10);
+	            JTextField colourField = new JTextField(rs.getString("colour"), 10);
+	            JTextField priceField = new JTextField(String.valueOf(rs.getDouble("price")), 10);
+	            JTextField quantityField = new JTextField(String.valueOf(rs.getInt("quantity")), 10);
+
+	            // Build small form with all of the input fields
+	            JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
+	            panel.add(new JLabel("Item Name:"));
+	            panel.add(nameField);
+	            panel.add(new JLabel("Category:"));
+	            panel.add(categoryField);
+	            panel.add(new JLabel("Size:"));
+	            panel.add(sizeField);
+	            panel.add(new JLabel("Colour:"));
+	            panel.add(colourField);
+	            panel.add(new JLabel("Price (€):"));
+	            panel.add(priceField);
+	            panel.add(new JLabel("Quantity:"));
+	            panel.add(quantityField);
+
+	            // Show the form to the user
+	            int result = JOptionPane.showConfirmDialog(
+	                    null, panel,
+	                    "Edit Item (ID: " + itemId + ")", JOptionPane.OK_CANCEL_OPTION,
+	                    JOptionPane.PLAIN_MESSAGE);
+
+	            // If the user cancels or closes the dialog, stop here
+	            if (result != JOptionPane.OK_OPTION) {
+	                if (!testMode) JOptionPane.showMessageDialog(null, "Edit cancelled. No changes were made.");
+	                rs.close();
+	                selectStmt.close();
+	                return;
+	            }
+
+	            // Read the values that the user entered and remove spaces
+	            name = nameField.getText().trim();
+	            category = categoryField.getText().trim();
+	            size = sizeField.getText().trim();
+	            colour = colourField.getText().trim();
+
+	            // Try converting price and quantity to numbers; stop if it fails
+	            try {
+	                price = Double.parseDouble(priceField.getText().trim());
+	                quantity = Integer.parseInt(quantityField.getText().trim());
+	            } catch (NumberFormatException ex) {
+	                if (!testMode) JOptionPane.showMessageDialog(null, "Invalid number format for price or quantity.");
+	                rs.close();
+	                selectStmt.close();
+	                return;
+	            }
+
 	        }
+	        else {
+	        	
+	            // ✅ TEST MODE (Jenkins/JUnit): use existing DB values (no GUI popups)
+	            name = rs.getString("itemName").trim();
+	            category = rs.getString("category").trim();
+	            size = rs.getString("size").trim();
+	            colour = rs.getString("colour").trim();
+	            price = rs.getDouble("price");
+	            quantity = rs.getInt("quantity");
+	        }
+
+	        // VALIDATION CHECKS 
+	        if (name.isEmpty()) throw new IllegalArgumentException("Item name cannot be empty.");
+	        if (category.isEmpty()) throw new IllegalArgumentException("Category cannot be empty.");
+	        if (size.isEmpty()) throw new IllegalArgumentException("Size cannot be empty.");
+	        if (colour.isEmpty()) throw new IllegalArgumentException("Colour cannot be empty.");
+	        if (price < 0) throw new IllegalArgumentException("Price cannot be negative.");
+	        if (quantity < 0) throw new IllegalArgumentException("Quantity cannot be negative.");
 
 	        // Update the item in the database with the new values
 	        String updateSQL = "UPDATE items SET itemName=?, category=?, size=?, colour=?, price=?, quantity=? WHERE itemId=?";
@@ -188,10 +216,12 @@ public class Inventory
 	        updateStmt.close();
 
 	        // Let the user know whether the update was successful
-	        if (rows > 0) {
-	            JOptionPane.showMessageDialog(null, "Item (ID: " + itemId + ") updated successfully!");
-	        } else {
-	            JOptionPane.showMessageDialog(null, "No changes were made (item may not exist).");
+	        if (!testMode) {
+	            if (rows > 0) {
+	                JOptionPane.showMessageDialog(null, "Item (ID: " + itemId + ") updated successfully!");
+	            } else {
+	                JOptionPane.showMessageDialog(null, "No changes were made (item may not exist).");
+	            }
 	        }
 
 	        rs.close();
@@ -201,9 +231,10 @@ public class Inventory
 	    {
 	        // Handle any database errors
 	        e.printStackTrace();
-	        JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
+	        if (!testMode) JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
 	    }
 	}
+
 
 
 	
