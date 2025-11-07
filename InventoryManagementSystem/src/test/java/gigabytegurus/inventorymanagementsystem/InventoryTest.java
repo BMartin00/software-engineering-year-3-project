@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -362,26 +363,170 @@ public class InventoryTest extends TestCase{
             fail("Should not throw exception for non-existent item");
         }
     }
+    
+
+  //Test #: 9
+  //Obj: Test filtering with "All" options
+  //Input(s): category="All Categories", size="All Sizes", colour="All Colours"
+  //Expected Output: All items in inventory are returned
+  public void testFilterItemsAllOptions() {
+      Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
+      Item hoodie = new Item(0, "Hoodie", "Hoodies", "L", "Blue", 39.99, 20, supplier);
+      Item tee = new Item(0, "Tee", "T-Shirts", "M", "Red", 19.99, 15, supplier);
+
+      inventory.addItem(hoodie);
+      inventory.addItem(tee);
+
+      List<Item> result = inventory.filterItems("All Categories", "All Sizes", "All Colours");
+      assertEquals("All items should be returned", 2, result.size());
+  }
+
+  //Test #: 10
+  //Obj: Test filtering by specific category
+  //Input(s): category="Hoodies"
+  //Expected Output: Only items in the "Hoodies" category are returned
+  public void testFilterItemsByCategory() {
+      Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
+      Item hoodie = new Item(0, "Hoodie", "Hoodies", "L", "Blue", 39.99, 20, supplier);
+      Item tee = new Item(0, "Tee", "T-Shirts", "M", "Red", 19.99, 15, supplier);
+
+      inventory.addItem(hoodie);
+      inventory.addItem(tee);
+
+      List<Item> result = inventory.filterItems("Hoodies", "All Sizes", "All Colours");
+      assertEquals(1, result.size());
+      assertEquals("Hoodies", result.get(0).getCategory());
+  }
+
+  //Test #: 11
+  //Obj: Test filtering by size
+  //Input(s): size="M"
+  //Expected Output: Only items of size M are returned
+  public void testFilterItemsBySize() {
+      Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
+      Item hoodie = new Item(0, "Hoodie", "Hoodies", "L", "Blue", 39.99, 20, supplier);
+      Item tee = new Item(0, "Tee", "T-Shirts", "M", "Red", 19.99, 15, supplier);
+
+      inventory.addItem(hoodie);
+      inventory.addItem(tee);
+
+      List<Item> result = inventory.filterItems("All Categories", "M", "All Colours");
+      assertEquals(1, result.size());
+      assertEquals("M", result.get(0).getSize());
+  }
+
+  //Test #: 12
+  //Obj: Test filtering by supplier/colour
+  //Input(s): colour="SupplierB"
+  //Expected Output: Only items from SupplierB are returned
+  public void testFilterItemsByColour() {
+      Supplier supplierA = new Supplier(1, "SupplierA", "a@test.com");
+      Supplier supplierB = new Supplier(2, "SupplierB", "b@test.com");
+      Item hoodie = new Item(0, "Hoodie", "Hoodies", "L", "Blue", 39.99, 20, supplierA);
+      Item tee = new Item(0, "Tee", "T-Shirts", "M", "Red", 19.99, 15, supplierB);
+
+      inventory.addItem(hoodie);
+      inventory.addItem(tee);
+
+      List<Item> result = inventory.filterItems("All Categories", "All Sizes", "SupplierB");
+      assertEquals(1, result.size());
+      assertEquals("SupplierB", result.get(0).getSupplier().getName());
+  }
+
+  //Test #: 13
+  //Obj: Test get low stock items below threshold
+  //Input(s): Items with quantity < 20
+  //Expected Output: Only low stock items are returned
+  public void testGetLowStockItems() {
+      Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
+      Item lowStock = new Item(0, "Hoodie", "Hoodies", "L", "Blue", 39.99, 10, supplier);
+      Item sufficientStock = new Item(0, "Tee", "T-Shirts", "M", "Red", 19.99, 25, supplier);
+
+      inventory.addItem(lowStock);
+      inventory.addItem(sufficientStock);
+
+      List<Item> lowStockItems = inventory.getLowStockItems();
+      assertEquals(1, lowStockItems.size());
+      assertEquals("Hoodie", lowStockItems.get(0).getName());
+  }
+
+  //Test #: 14
+  //Obj: Test get low stock items on empty inventory
+  //Input(s): Inventory has no items
+  //Expected Output: Returns empty list
+  public void testGetLowStockItemsEmpty() {
+      // Ensure inventory is initialized
+      if (inventory == null) {
+          inventory = new Inventory();
+      }
+
+      List<Item> lowStockItems = inventory.getLowStockItems();
+      assertTrue(lowStockItems.isEmpty());
+  }
+
+  //Test #: 15
+  //Obj: Low stock boundary test
+  //Input(s): Item with quantity exactly 20
+  //Expected Output: Item is NOT considered low stock
+  public void testLowStockBoundary() {
+      Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
+      Item boundaryItem = new Item(0, "Jacket", "Jackets", "M", "Blue", 49.99, 20, supplier);
+
+      inventory.addItem(boundaryItem);
+
+      List<Item> lowStockItems = inventory.getLowStockItems();
+      assertFalse("Item with quantity 20 is not low stock", lowStockItems.contains(boundaryItem));
+  }
+  
+//Test #: 16
+//Obj: Test filtering when no items match the criteria
+//Input(s): category="Shoes", size="S", colour="Green" (none exist)
+//Expected Output: Returns empty list
+public void testFilterItemsNoMatch() {
+    Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
+    Item hoodie = new Item(0, "Hoodie", "Hoodies", "L", "Blue", 39.99, 20, supplier);
+    Item tee = new Item(0, "Tee", "T-Shirts", "M", "Red", 19.99, 15, supplier);
+    
+    inventory.addItem(hoodie);
+    inventory.addItem(tee);
+    
+    List<Item> result = inventory.filterItems("Shoes", "S", "Green");
+    assertTrue("No items should match", result.isEmpty());
+}
+
+//Test #: 17
+//Obj: Test filtering with multiple specific filters combined
+//Input(s): category="Hoodies", size="L", colour="Blue"
+//Expected Output: Only the item that matches all three filters is returned
+public void testFilterItemsMultipleFilters() {
+    Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
+    Item hoodie = new Item(0, "Hoodie", "Hoodies", "L", "Blue", 39.99, 20, supplier);
+    Item hoodieRed = new Item(0, "Hoodie", "Hoodies", "L", "Red", 39.99, 20, supplier);
+    
+    inventory.addItem(hoodie);
+    inventory.addItem(hoodieRed);
+    
+    List<Item> result = inventory.filterItems("Hoodies", "L", "Blue");
+    assertEquals("Only one item should match all filters", 1, result.size());
+    assertEquals("Blue", result.get(0).getColour());
+}
+
+//Test #: 18
+//Obj: Test filtering on empty inventory
+//Input(s): any category/size/colour
+//Expected Output: Returns empty list without errors
+public void testFilterItemsEmptyInventory() {
+    inventory = new Inventory(); // ensure inventory is empty
+    
+    List<Item> result = inventory.filterItems("All Categories", "All Sizes", "All Colours");
+    assertTrue("Filtering empty inventory returns empty list", result.isEmpty());
+}
+
+
+  
+
 
 	
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     // KEEP THIS METHOD AT THE BOTTOM OF THE FILE AT ALL TIMES TO RESET THE DATABASE EVERY RUN SO YOU DONT HAVE TO RUN A NEW SQL FILE EVERYTIME
     @Override

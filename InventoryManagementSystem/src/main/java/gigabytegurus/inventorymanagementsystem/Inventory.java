@@ -17,6 +17,10 @@ public class Inventory
 {
 	private List<Item> items;
 	
+	public Inventory() {
+        this.items = new ArrayList<>();
+    }
+	
 	public boolean testMode = false;
 	
 	
@@ -307,39 +311,41 @@ public class Inventory
 		return items;
 	}
 	
-	
-	
-	
-	
-	
-	public List<Item> filterItems(String category, String size, String colour) {
-        List<Item> filtered = new ArrayList<>();
-        if (items == null) return filtered;
-        
-        for (Item item : items) { 
-            boolean matchesCategory = category.equals("All Categories") || item.getCategory().equals(category);
-            boolean matchesSize = size.equals("All Sizes") || item.getSize().equals(size);
-            boolean matchesBrand = colour.equals("All Colours") || 
-                    (item.getSupplier() != null && item.getSupplier().getName().equals(colour));
-            if (matchesCategory && matchesSize && matchesBrand) {
-                filtered.add(item);
-            }
-        }
-        return filtered;
-    }
+	public List<Item> filterItems(String category, String size, String colourOrSupplier) {
+	    List<Item> filtered = new ArrayList<>();
+
+	    for (Item item : items) {
+	        boolean matchesCategory = category.equals("All Categories") || 
+	                                  (item.getCategory() != null && item.getCategory().equals(category));
+
+	        boolean matchesSize = size.equals("All Sizes") || 
+	                              (item.getSize() != null && item.getSize().equals(size));
+	        boolean matchesColourOrSupplier = colourOrSupplier.equals("All Colours") || 
+	                                          (item.getColour() != null && item.getColour().equals(colourOrSupplier)) ||
+	                                          (item.getSupplier() != null && item.getSupplier().getName().equals(colourOrSupplier));
+
+	        if (matchesCategory && matchesSize && matchesColourOrSupplier) {
+	            filtered.add(item);
+	        }
+	    }
+	    return filtered;
+	}
+
+
 
     public List<Item> getLowStockItems() {
         List<Item> lowStock = new ArrayList<>();
         if (items == null) return lowStock;
-        
-        for (Item item : items) { 
-            if (item.getQuantity() < 20) { 
+
+        for (Item item : items) {
+            if (item != null && item.getQuantity() < 20) {
                 lowStock.add(item);
             }
         }
         return lowStock;
-       
     }
+
+
     
 	public Report generateReport(String format)
 	{
