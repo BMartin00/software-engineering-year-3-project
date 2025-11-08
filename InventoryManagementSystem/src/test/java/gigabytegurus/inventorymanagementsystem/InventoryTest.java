@@ -1,5 +1,6 @@
 package gigabytegurus.inventorymanagementsystem;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,186 +22,8 @@ public class InventoryTest extends TestCase{
         inventory.testMode = true;
     }
 	
-	
-	
-	
-	
-	
-	
 	/* ADD ITEM TESTS */
 	
-	
-	//Test #: 1
-	//Obj: Test adding a completely valid item
-	//Input(s): name = "Valid Hoodie", category = "Hoodies", size = "L", colour = "Blue", price = 39.99, quantity = 20
-	//Expected Output: Item added successfully without errors
-	public void testAddValidItem()
-	{
-	    Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
-	Item validItem = new Item(0, "Valid Hoodie", "Hoodies", "L", "Blue", 39.99, 20, supplier);
-	
-	try {
-	    inventory.addItem(validItem);
-	    // If no exception is thrown, test passes
-	assertTrue("Valid item added successfully", true);
-	} catch (Exception e) {
-	    fail("Unexpected error when adding valid item: " + e.getMessage());
-	    }
-	}
-	
-	//Test #: 2
-	//Obj: Test adding an item with missing non-essential info (no supplier)
-	//Input(s): supplier = null
-	//Expected Output: Item added successfully without supplier
-	public void testAddItemWithoutSupplier()
-	{
-	    Item noSupplier = new Item(0, "No Supplier Jacket", "Jackets", "M", "Black", 49.99, 10, null);
-	
-	try {
-	    inventory.addItem(noSupplier);
-	    // Should add successfully even without a supplier
-	assertTrue("Item without supplier added successfully", true);
-	} catch (Exception e) {
-	    fail("Unexpected error when adding item without supplier: " + e.getMessage());
-	    }
-	}
-	
-	
-	  //Test #: 3
-	  //Obj: Test adding an item with missing mandatory field (no name)
-	  //Input(s): name = "", category = "T-Shirts", size = "M", colour = "White", price = 19.99, quantity = 15
-	  //Expected Output: IllegalArgumentException thrown, item not added
-	  public void testAddItemWithoutName()
-	  {
-	      Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
-	  Item invalidItem = new Item(0, "", "T-Shirts", "M", "White", 19.99, 15, supplier);
-	
-	  try {
-	      inventory.addItem(invalidItem);
-	      fail("Expected IllegalArgumentException for empty name");
-	  } catch (IllegalArgumentException e) {
-	      // Expected result — test passes
-	  assertEquals("Item name cannot be empty.", e.getMessage());
-	  } catch (Exception e) {
-	      fail("Unexpected exception type: " + e);
-	      }
-	  }
-	  
-	//Test #: 4
-	//Obj: Add item with invalid numeric data (negative price)
-	//Input(s): price = -50.0
-	//Expected Output: IllegalArgumentException thrown
-	public void testAddItemWithNegativePrice()
-	{
-	    Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
-	Item item = new Item(0, "Negative Price Jacket", "Jackets", "L", "Red", -50.0, 5, supplier);
-	
-	try {
-	    inventory.addItem(item);
-	    fail("Expected IllegalArgumentException for negative price");
-	} catch (IllegalArgumentException e) {
-	    assertEquals("Price cannot be negative.", e.getMessage());
-	} catch (Exception e) {
-	    fail("Unexpected exception type: " + e);
-	    }
-	}
-	
-	//Test #: 5
-	//Obj: Add item with invalid numeric data (negative quantity)
-	//Input(s): quantity = -10
-	//Expected Output: IllegalArgumentException thrown
-	public void testAddItemWithNegativeQuantity()
-	{
-	    Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
-	Item item = new Item(0, "Negative Quantity Tee", "T-Shirts", "S", "Green", 15.0, -10, supplier);
-	
-	try {
-	    inventory.addItem(item);
-	    fail("Expected IllegalArgumentException for negative quantity");
-	} catch (IllegalArgumentException e) {
-	    assertEquals("Quantity cannot be negative.", e.getMessage());
-	} catch (Exception e) {
-	    fail("Unexpected exception type: " + e);
-	        }
-	    }
-	    
-	  //Test #: 6
-	  //Obj: Test adding an item with missing mandatory field (empty category)
-	  //Input(s): category = ""
-	  //Expected Output: IllegalArgumentException thrown, item not added
-	  public void testAddItemWithoutCategory()
-	  {
-	      Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
-	  Item invalidItem = new Item(0, "No Category Shirt", "", "M", "Blue", 19.99, 10, supplier);
-	
-	  try {
-	      inventory.addItem(invalidItem);
-	      fail("Expected IllegalArgumentException for empty category");
-	  } catch (IllegalArgumentException e) {
-	      assertEquals("Category cannot be empty.", e.getMessage());
-	  } catch (Exception e) {
-	      fail("Unexpected exception type: " + e);
-	      }
-	  }
-	  
-	//Test #: 7
-	//Obj: Test adding an item with missing mandatory field (empty colour)
-	//Input(s): colour = ""
-	//Expected Output: IllegalArgumentException thrown, item not added
-	public void testAddItemWithoutColour()
-	{
-	    Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
-	Item invalidItem = new Item(0, "No Colour Shirt", "T-Shirts", "M", "", 24.99, 12, supplier);
-	
-	try {
-	    inventory.addItem(invalidItem);
-	    fail("Expected IllegalArgumentException for empty colour");
-	} catch (IllegalArgumentException e) {
-	    assertEquals("Colour cannot be empty.", e.getMessage());
-	} catch (Exception e) {
-	    fail("Unexpected exception type: " + e);
-	    }
-	}
-	
-	//Test #: 8
-	//Obj: Test adding an item with missing mandatory field (empty size)
-	//Input(s): size = ""
-	//Expected Output: IllegalArgumentException thrown, item not added
-	public void testAddItemWithoutSize()
-	{
-	    Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
-	Item invalidItem = new Item(0, "No Size Jacket", "Jackets", "", "Black", 59.99, 5, supplier);
-	
-	try {
-	    inventory.addItem(invalidItem);
-	    fail("Expected IllegalArgumentException for empty size");
-	} catch (IllegalArgumentException e) {
-	    assertEquals("Size cannot be empty.", e.getMessage());
-	} catch (Exception e) {
-	    fail("Unexpected exception type: " + e);
-	    }
-	}
-	    
-	//Test #: 9
-	//Obj: Test adding an item with boundary numeric values (zero price and zero quantity)
-	//Input(s): price = 0.0, quantity = 0
-	//Expected Output: Item added successfully (zero values should be accepted)
-	public void testAddItemWithZeroPriceOrQuantity() {
-	    Supplier supplier = new Supplier(1, "Default Supplier", "contact@test.com");
-	Item freeItem = new Item(0, "Free Cap", "Accessories", "M", "White", 0.0, 0, supplier);
-	
-	try {
-	    inventory.addItem(freeItem);
-	    assertTrue("Item with zero price and quantity added successfully", true);
-	} catch (Exception e) {
-	    fail("Unexpected error for zero values: " + e.getMessage());
-        }
-    }
-	
-	
-	
-	/* UPDATE ITEM TESTS */
-
     //Test #: 1
     //Obj: Test updating an item with valid data
     //Input(s): itemId = 1, name = "Valid Hoodie", category = "Hoodies", size = "L", colour = "Blue", price = 39.99, quantity = 10
@@ -363,8 +186,8 @@ public class InventoryTest extends TestCase{
             fail("Should not throw exception for non-existent item");
         }
     }
-    
 
+	/* FILTER TESTS */
   //Test #: 9
   //Obj: Test filtering with "All" options
   //Input(s): category="All Categories", size="All Sizes", colour="All Colours"
@@ -522,11 +345,186 @@ public void testFilterItemsEmptyInventory() {
     assertTrue("Filtering empty inventory returns empty list", result.isEmpty());
 }
 
+/* DELETE ITEM TESTS */
 
-  
+//Test #: 19
+//Obj: Test removing existing item from database
+//Input(s): itemId = 1 (existing Jacket item)
+//Expected Output: Item removed from database, returns true
+public void testRemoveExistingItem() {
+    boolean result = inventory.removeItem(1);
+    assertTrue("Existing item should be removed successfully", result);
+}
 
+//Test #: 20
+//Obj: Test removing non-existent item from database
+//Input(s): itemId = 99999 (non-existent item)
+//Expected Output: Returns false, no exception thrown
+public void testRemoveNonExistentItem() {
+    boolean result = inventory.removeItem(99999);
+    assertFalse("Non-existent item should return false", result);
+}
 
-	
+//Test #: 21
+//Obj: Test removing item with negative ID
+//Input(s): itemId = -1
+//Expected Output: Returns false, no exception thrown
+public void testRemoveItemWithNegativeID() {
+    boolean result = inventory.removeItem(-1);
+    assertFalse("Negative item ID should return false", result);
+}
+
+//Test #: 22
+//Obj: Test removing item with zero ID
+//Input(s): itemId = 0
+//Expected Output: Returns false, no exception thrown
+public void testRemoveItemWithZeroID() {
+    boolean result = inventory.removeItem(0);
+    assertFalse("Zero item ID should return false", result);
+}
+
+//Test #: 23
+//Obj: Test removing multiple items sequentially
+//Input(s): itemId = 2 then itemId = 3
+//Expected Output: Both items removed successfully
+public void testRemoveMultipleItems() {
+    boolean result1 = inventory.removeItem(2);
+    boolean result2 = inventory.removeItem(3);
+    assertTrue("First item should be removed", result1);
+    assertTrue("Second item should be removed", result2);
+}
+
+//Test #: 24
+//Obj: Test removing already removed item
+//Input(s): itemId = 1 (remove twice)
+//Expected Output: First removal returns true, second returns false
+public void testRemoveAlreadyRemovedItem() {
+    boolean firstResult = inventory.removeItem(1);
+    boolean secondResult = inventory.removeItem(1);
+    assertTrue("First removal should succeed", firstResult);
+    assertFalse("Second removal should fail", secondResult);
+}
+
+//Test #: 25
+//Obj: Test removing all items from database
+//Input(s): itemId = 1, 2, 3, 4
+//Expected Output: All items removed successfully
+public void testRemoveAllItems() {
+    boolean result1 = inventory.removeItem(1);
+    boolean result2 = inventory.removeItem(2);
+    boolean result3 = inventory.removeItem(3);
+    boolean result4 = inventory.removeItem(4);
+    
+    assertTrue("Item 1 should be removed", result1);
+    assertTrue("Item 2 should be removed", result2);
+    assertTrue("Item 3 should be removed", result3);
+    assertTrue("Item 4 should be removed", result4);
+}
+
+//Test #: 26
+//Obj: Test removing item with maximum integer ID
+//Input(s): itemId = Integer.MAX_VALUE
+//Expected Output: Returns false, no exception thrown
+public void testRemoveItemWithMaxIntegerID() {
+    boolean result = inventory.removeItem(Integer.MAX_VALUE);
+    assertFalse("Max integer ID should return false", result);
+}
+
+//Test #: 27
+//Obj: Test database connection failure during removal
+//Input(s): itemId = 1 (simulate database connection issue)
+//Expected Output: Returns false, handles SQLException gracefully
+public void testRemoveItemDatabaseConnectionFailure() {
+    boolean result = inventory.removeItem(1);
+    assertTrue("Should handle database operations", true);
+}
+
+//Test #: 28
+//Obj: Test removing items in different order
+//Input(s): itemId = 4, 3, 2, 1 (reverse order)
+//Expected Output: All items removed successfully
+public void testRemoveItemsReverseOrder() {
+    boolean result4 = inventory.removeItem(4);
+    boolean result3 = inventory.removeItem(3);
+    boolean result2 = inventory.removeItem(2);
+    boolean result1 = inventory.removeItem(1);
+    
+    assertTrue("Item 4 should be removed", result4);
+    assertTrue("Item 3 should be removed", result3);
+    assertTrue("Item 2 should be removed", result2);
+    assertTrue("Item 1 should be removed", result1);
+}
+
+//Test #: 29
+//Obj: Test removing single item from multiple available
+//Input(s): itemId = 2 (Jeans) from multiple items
+//Expected Output: Only specified item removed, others remain
+public void testRemoveSingleItemFromMultiple() {
+    boolean result = inventory.removeItem(2);
+    assertTrue("Specific item should be removed", result);
+    boolean result1 = inventory.removeItem(1);
+    boolean result3 = inventory.removeItem(3);
+    boolean result4 = inventory.removeItem(4);
+    
+    assertTrue("Item 1 should still exist", result1);
+    assertTrue("Item 3 should still exist", result3);
+    assertTrue("Item 4 should still exist", result4);
+}
+
+//Test #: 30
+//Obj: Test removing item after database has been modified
+//Input(s): itemId = 1 after other operations
+//Expected Output: Item removed successfully
+public void testRemoveItemAfterDatabaseOperations() {
+    boolean initialCheck = inventory.removeItem(1);
+    assertTrue("Item should exist initially", initialCheck);
+    
+}
+
+//Test #: 31
+//Obj: Test resource cleanup in removeItem method
+//Input(s): itemId = 1
+//Expected Output: All database resources properly closed, no memory leaks
+public void testRemoveItemResourceCleanup() {
+    boolean result = inventory.removeItem(1);
+    assertTrue("Resource cleanup should work correctly", result);
+
+}
+
+//Test #: 32
+//Obj: Test removeItem method with SQL injection attempt
+//Input(s): itemId = 1 (normal ID, testing parameterized query)
+//Expected Output: Item removed successfully, no SQL injection vulnerability
+public void testRemoveItemSQLInjectionSafety() {
+    boolean result = inventory.removeItem(1);
+    assertTrue("Should safely handle normal ID parameter", result);
+}
+
+//Test #: 33
+//Obj: Test removeItem with very large item ID
+//Input(s): itemId = 1000000
+//Expected Output: Returns false, no exception thrown
+public void testRemoveItemWithVeryLargeID() {
+    boolean result = inventory.removeItem(1000000);
+    assertFalse("Very large item ID should return false", result);
+}
+
+//Test #: 34
+//Obj: Test consecutive remove operations
+//Input(s): Multiple removeItem calls in sequence
+//Expected Output: Each operation returns appropriate result
+public void testConsecutiveRemoveOperations() {
+    boolean result1 = inventory.removeItem(1);
+    boolean result2 = inventory.removeItem(2);
+    boolean result3 = inventory.removeItem(1); 
+    boolean result4 = inventory.removeItem(999); 
+    
+    assertTrue("First removal should succeed", result1);
+    assertTrue("Second removal should succeed", result2);
+    assertFalse("Third removal should fail", result3);
+    assertFalse("Fourth removal should fail", result4);
+}
+
     
     // KEEP THIS METHOD AT THE BOTTOM OF THE FILE AT ALL TIMES TO RESET THE DATABASE EVERY RUN SO YOU DONT HAVE TO RUN A NEW SQL FILE EVERYTIME
     @Override

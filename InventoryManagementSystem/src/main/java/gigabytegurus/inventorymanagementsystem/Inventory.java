@@ -239,43 +239,8 @@ public class Inventory
 	    }
 	}
 
-
-
-	
-	public void removeItem(int itemId) {
+	public boolean removeItem(int itemId) {
 	    try (Connection conn = DatabaseConnection.getConnection()) {
-	        // First, check if the item exists
-	        String checkSQL = "SELECT * FROM items WHERE itemId = ?";
-	        PreparedStatement checkStmt = conn.prepareStatement(checkSQL);
-	        checkStmt.setInt(1, itemId);
-	        ResultSet rs = checkStmt.executeQuery();
-
-	        if (!rs.next()) {
-	            JOptionPane.showMessageDialog(null, "No item found with ID: " + itemId);
-	            checkStmt.close();
-	            return;
-	        }
-
-	        // Show confirmation  with item details
-	        String itemName = rs.getString("itemName");
-	        int confirm = JOptionPane.showConfirmDialog(
-	            null,
-	            "Are you sure you want to delete:\n" +
-	            "ID: " + itemId + "\n" +
-	            "Name: " + itemName + "\n" +
-	            "This action cannot be undone!",
-	            "Confirm Deletion",
-	            JOptionPane.YES_NO_OPTION,
-	            JOptionPane.WARNING_MESSAGE
-	        );
-
-	        if (confirm != JOptionPane.YES_OPTION) {
-	            JOptionPane.showMessageDialog(null, "Deletion cancelled.");
-	            rs.close();
-	            checkStmt.close();
-	            return;
-	        }
-
 	        // Delete the item from database
 	        String deleteSQL = "DELETE FROM items WHERE itemId = ?";
 	        PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL);
@@ -285,25 +250,18 @@ public class Inventory
 	        deleteStmt.close();
 
 	        if (rowsAffected > 0) {
-	            JOptionPane.showMessageDialog(null, "Item deleted successfully!");
-	           
 	            if (items != null) {
 	                items.removeIf(item -> item.getItemId() == itemId);
 	            }
+	            return true;
 	        } else {
-	            JOptionPane.showMessageDialog(null, "Failed to delete item.");
+	            return false; 
 	        }
-
-	        rs.close();
-	        checkStmt.close();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
-	        JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
+	        return false; 
 	    }
 	}
-	
-
-	
 	
 	
 	public List<Item> searchItem(String keyword)
@@ -320,6 +278,7 @@ public class Inventory
 
 	        boolean matchesSize = size.equals("All Sizes") || 
 	                              (item.getSize() != null && item.getSize().equals(size));
+
 	        boolean matchesColourOrSupplier = colourOrSupplier.equals("All Colours") || 
 	                                          (item.getColour() != null && item.getColour().equals(colourOrSupplier)) ||
 	                                          (item.getSupplier() != null && item.getSupplier().getName().equals(colourOrSupplier));
@@ -345,8 +304,6 @@ public class Inventory
         return lowStock;
     }
 
-
-    
 	public Report generateReport(String format)
 	{
 		return null;
