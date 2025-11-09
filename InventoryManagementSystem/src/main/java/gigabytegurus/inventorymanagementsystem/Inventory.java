@@ -263,11 +263,112 @@ public class Inventory
 	    }
 	}
 	
-	
-	public List<Item> searchItem(String keyword)
-	{
-		return items;
+	public List<Item> searchItem(String keyword) {
+	    List<Item> searchResults = new ArrayList<>();
+	    
+	    // Enhanced input validation
+	    if (keyword == null || keyword.trim().isEmpty()) {
+	        if (!testMode) {
+	            JOptionPane.showMessageDialog(null, "Please enter a keyword to search.");
+	        }
+	        return searchResults;
+	    }
+	    
+	    String searchTerm = "%" + keyword.trim() + "%";
+	    
+	    // More precise SQL query with individual field matching for better performance
+	    String sql = """
+	        SELECT 
+	            i.itemId, i.itemName, i.category, i.size, i.colour, 
+	            i.price, i.quantity, i.supplier_id,
+	            s.name AS supplierName, s.contact AS supplierContact
+	        FROM items i
+	        LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id
+	        WHERE i.itemName LIKE ? 
+	           OR i.category LIKE ? 
+	           OR i.size LIKE ? 
+	           OR i.colour LIKE ? 
+	           OR s.name LIKE ?
+	        ORDER BY i.itemName, i.category
+	    """;
+
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        
+	        for (int i = 1; i <= 5; i++) {
+	            stmt.setString(i, searchTerm);
+	        }
+	        
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                Supplier supplier = null;
+	                int supplierId = rs.getInt("supplier_id");
+	                
+	                if (!rs.wasNull()) {
+	                    supplier = new Supplier(
+	                        supplierId,
+	                        rs.getString("supplierName"),
+	                        rs.getString("supplierContact")
+	                    );
+	                }
+
+	                Item item = new Item(
+	                    rs.getInt("itemId"),
+	                    rs.getString("itemName"),
+	                    rs.getString("category"),
+	                    rs.getString("size"),
+	                    rs.getString("colour"),
+	                    rs.getDouble("price"),
+	                    rs.getInt("quantity"),
+	                    supplier
+	                );
+
+	                searchResults.add(item);
+	            }
+	        }
+	        
+	        if (searchResults.isEmpty() && !testMode) {
+	            JOptionPane.showMessageDialog(
+	                null, 
+	                "No matching items found for: \"" + keyword.trim() + "\"\n\n" +
+	                "Try searching by:\n" +
+	                "• Item name\n" +
+	                "• Category\n" + 
+	                "• Size\n" +
+	                "• Colour\n" +
+	                "• Supplier name",
+	                "No Results Found",
+	                JOptionPane.INFORMATION_MESSAGE
+	            );
+	        } else if (!testMode && searchResults.size() > 0) {
+	           
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        if (!testMode) {
+	            JOptionPane.showMessageDialog(
+	                null, 
+	                "Database error while searching: " + e.getMessage(),
+	                "Search Error",
+	                JOptionPane.ERROR_MESSAGE
+	            );
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        if (!testMode) {
+	            JOptionPane.showMessageDialog(
+	                null, 
+	                "Unexpected error during search: " + e.getMessage(),
+	                "Error",
+	                JOptionPane.ERROR_MESSAGE
+	            );
+	        }
+	    }
+
+	    return searchResults;
 	}
+	
 	
 	public List<Item> filterItems(String category, String size, String colourOrSupplier) {
 	    List<Item> filtered = new ArrayList<>();

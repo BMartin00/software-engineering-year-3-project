@@ -410,6 +410,64 @@ public class Dashboard
 	    // Add the Edit Item button to the bottom panel alongside the buttons
 	    bottomPanel.add(editItemButton);
 	    
+	 // SEARCH BUTTON 
+	    JButton searchItemButton = new JButton("Search Item");
+	    searchItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18)); // Fixed: PLAIN not PLAN
+	    bottomPanel.add(searchItemButton); // Fixed: bottomPanel not buttonBatch
+
+	    // Search Item Button Logic
+	    searchItemButton.addActionListener(e -> { 
+	        try {
+	    
+	            String keyword = JOptionPane.showInputDialog(
+	                inventoryWindow, 
+	                "Enter keyword to search (name, category, size, colour, supplier):",
+	                "Search Item",
+	                JOptionPane.QUESTION_MESSAGE 
+	            );
+	            
+	            if (keyword == null || keyword.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No keyword entered. Search cancelled."); 
+	                return;
+	            }
+
+	            Inventory inventory = new Inventory();
+	            List<Item> searchResults = inventory.searchItem(keyword);
+
+	            // Update table with search results
+	            DefaultTableModel model = new DefaultTableModel(
+	                new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+	            );
+
+	            for (Item item : searchResults) {
+	                model.addRow(new Object[]{ 
+	                    item.getItemId(),
+	                    item.getName(), 
+	                    item.getCategory(),
+	                    item.getSize(),
+	                    item.getColour(), 
+	                    item.getQuantity(),
+	                    item.getPrice(),
+	                    item.getSupplier() != null ? item.getSupplier().getName() : ""
+	                });
+	            }
+
+	            table.setModel(model);
+	            highlightLowStock(table); 
+
+	            if (!searchResults.isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow,
+	                    "Found " + searchResults.size() + " item(s) matching: " + keyword, 
+	                    "Search Results", 
+	                    JOptionPane.INFORMATION_MESSAGE); 
+	            }
+
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(inventoryWindow, "Error searching items: " + ex.getMessage()); // Fixed: inventoryWindow
+	        }
+	    });
+	    
 	 // DELETE BUTTON
 	    JButton deleteButton = new JButton("Delete");
 	    deleteButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
@@ -467,6 +525,7 @@ public class Dashboard
 
 	    // Add the delete button to the bottom panel
 	    bottomPanel.add(deleteButton);
+	    
 	    
 	    //Filter 
 	    JButton filterButton = new JButton("Filter Items");
@@ -567,6 +626,9 @@ public class Dashboard
 	        }
 	    });
     }
+    
+    
+    
     private void highlightLowStock(JTable table) {
         // Set a custom cell for all cells in the table
         table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
@@ -594,9 +656,8 @@ public class Dashboard
                     c.setBackground(Color.WHITE);
                 }
 
-                // If the row is selected by the user, use the standard color 
                 if (isSelected) {
-                    c.setBackground(new Color(184, 207, 229)); // Light blue
+                    c.setBackground(new Color(184, 207, 229));
                 }
 
                 // Return the modified cell component to display
@@ -604,7 +665,6 @@ public class Dashboard
             }
         });
     }
-    
     
     public List<Item> loadItemsFromDatabase()
     {
