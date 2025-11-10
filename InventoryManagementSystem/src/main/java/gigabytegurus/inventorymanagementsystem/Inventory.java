@@ -26,10 +26,235 @@ public class Inventory
 	
 	
 	
+	public List<Item> organizeByCategory() {
+	    List<Item> organizedItems = new ArrayList<>();
+	    String sql = "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+	                 "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id " +
+	                 "ORDER BY category, itemName";
+	    
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+	        
+	        while (rs.next()) {
+	            Supplier supplier = null;
+	            int supplierId = rs.getInt("supplier_id");
+	            
+	            if (!rs.wasNull()) {
+	                supplier = new Supplier(
+	                    supplierId,
+	                    rs.getString("supplierName"),
+	                    rs.getString("supplierContact")
+	                );
+	            }
+
+	            Item item = new Item(
+	                rs.getInt("itemId"),
+	                rs.getString("itemName"),
+	                rs.getString("category"),
+	                rs.getString("size"),
+	                rs.getString("colour"),
+	                rs.getDouble("price"),
+	                rs.getInt("quantity"),
+	                supplier
+	            );
+
+	            organizedItems.add(item);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return organizedItems;
+	}
+	
+	
+	public List<Item> organizeBySize() {
+	    List<Item> organizedItems = new ArrayList<>();
+	    String sql = """
+	        SELECT i.*, s.name AS supplierName, s.contact AS supplierContact 
+	        FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id 
+	        ORDER BY 
+	        CASE 
+	            WHEN UPPER(size) = 'XS' THEN 1
+	            WHEN UPPER(size) = 'S' THEN 2
+	            WHEN UPPER(size) = 'M' THEN 3
+	            WHEN UPPER(size) = 'L' THEN 4
+	            WHEN UPPER(size) = 'XL' THEN 5
+	            WHEN UPPER(size) = 'XXL' THEN 6
+	            WHEN UPPER(size) = 'XXXL' THEN 7
+	            ELSE 8
+	        END, 
+	        itemName
+	    """;
+	    
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+	        
+	        while (rs.next()) {
+	            Supplier supplier = null;
+	            int supplierId = rs.getInt("supplier_id");
+	            
+	            if (!rs.wasNull()) {
+	                supplier = new Supplier(
+	                    supplierId,
+	                    rs.getString("supplierName"),
+	                    rs.getString("supplierContact")
+	                );
+	            }
+
+	            Item item = new Item(
+	                rs.getInt("itemId"),
+	                rs.getString("itemName"),
+	                rs.getString("category"),
+	                rs.getString("size"),
+	                rs.getString("colour"),
+	                rs.getDouble("price"),
+	                rs.getInt("quantity"),
+	                supplier
+	            );
+
+	            organizedItems.add(item);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return organizedItems;
+	}
+	
+	
+	public List<Item> organizeByColour() {
+	    List<Item> organizedItems = new ArrayList<>();
+	    String sql = "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+	                 "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id " +
+	                 "ORDER BY colour, itemName";
+	    
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+	        
+	        while (rs.next()) {
+	            Supplier supplier = null;
+	            int supplierId = rs.getInt("supplier_id");
+	            
+	            if (!rs.wasNull()) {
+	                supplier = new Supplier(
+	                    supplierId,
+	                    rs.getString("supplierName"),
+	                    rs.getString("supplierContact")
+	                );
+	            }
+
+	            Item item = new Item(
+	                rs.getInt("itemId"),
+	                rs.getString("itemName"),
+	                rs.getString("category"),
+	                rs.getString("size"),
+	                rs.getString("colour"),
+	                rs.getDouble("price"),
+	                rs.getInt("quantity"),
+	                supplier
+	            );
+
+	            organizedItems.add(item);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return organizedItems;
+	}
+	
+	
+	public List<Item> organizeByPrice() {
+	    List<Item> organizedItems = new ArrayList<>();
+	    String sql = "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+	                 "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id " +
+	                 "ORDER BY price, itemName";
+	    
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+	        
+	        while (rs.next()) {
+	            Supplier supplier = null;
+	            int supplierId = rs.getInt("supplier_id");
+	            
+	            if (!rs.wasNull()) {
+	                supplier = new Supplier(
+	                    supplierId,
+	                    rs.getString("supplierName"),
+	                    rs.getString("supplierContact")
+	                );
+	            }
+
+	            Item item = new Item(
+	                rs.getInt("itemId"),
+	                rs.getString("itemName"),
+	                rs.getString("category"),
+	                rs.getString("size"),
+	                rs.getString("colour"),
+	                rs.getDouble("price"),
+	                rs.getInt("quantity"),
+	                supplier
+	            );
+
+	            organizedItems.add(item);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return organizedItems;
+	}
+	
+	
+	public List<Item> getItemVariations(String itemName) {
+	    List<Item> variations = new ArrayList<>();
+	    String sql = "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+	                 "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id " +
+	                 "WHERE i.itemName = ? " +
+	                 "ORDER BY size, colour";
+	    
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        
+	        stmt.setString(1, itemName);
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                Supplier supplier = null;
+	                int supplierId = rs.getInt("supplier_id");
+	                
+	                if (!rs.wasNull()) {
+	                    supplier = new Supplier(
+	                        supplierId,
+	                        rs.getString("supplierName"),
+	                        rs.getString("supplierContact")
+	                    );
+	                }
+
+	                Item item = new Item(
+	                    rs.getInt("itemId"),
+	                    rs.getString("itemName"),
+	                    rs.getString("category"),
+	                    rs.getString("size"),
+	                    rs.getString("colour"),
+	                    rs.getDouble("price"),
+	                    rs.getInt("quantity"),
+	                    supplier
+	                );
+
+	                variations.add(item);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return variations;
+	}
+	
+	// Original methods below (unchanged)
+	
 	public void addItem(Item item)
 	{
-		
-		
 		//VALIDATION CHECKS FOR JUNIT TESTS ON ADD
 		if (item == null) {
 	        throw new IllegalArgumentException("Item cannot be null.");
@@ -64,7 +289,7 @@ public class Inventory
 	    {
 	        
 	    	// SQL query to insert a new item into the database
-	        // The "itemId" column is omitted because it’s auto-generated.
+	        // The "itemId" column is omitted because it's auto-generated.
 	        String sql = "INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_id) " +
 	                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
 	        
@@ -101,9 +326,6 @@ public class Inventory
 	        System.err.println("Error adding item: " + e.getMessage());
 	    }
 	}
-	
-	
-	
 	
 	
 	public void updateItem(int itemId)
@@ -413,15 +635,3 @@ public class Inventory
 		return null;
 	}
 }
-	
-	
-
-
-    
-    
-	
-
-
-
-
-

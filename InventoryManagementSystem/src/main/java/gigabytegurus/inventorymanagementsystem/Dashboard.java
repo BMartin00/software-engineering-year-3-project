@@ -38,7 +38,7 @@ public class Dashboard
         panel.add(username, constraint);
         constraint.gridx = 1;
         panel.add(usernameInput, constraint);
-
+        
         // Password row
         constraint.gridx = 0; constraint.gridy = 1;
         panel.add(password, constraint);
@@ -162,9 +162,6 @@ public class Dashboard
         }
     }
     
-    
-    
-    
     public void openInventoryWindow()
     {
 	    JFrame inventoryWindow = new JFrame("Inventory Dashboard");
@@ -234,8 +231,6 @@ public class Dashboard
 	    JButton addItemButton = new JButton("Add New Item");
 	    addItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 	    
-	    
-	    // When the button is clicked, open a popup form for user input
 	    addItemButton.addActionListener(e -> {
 	    	
 	    	// Create text fields for each clothing attribute
@@ -412,8 +407,8 @@ public class Dashboard
 	    
 	    // SEARCH BUTTON 
 	    JButton searchItemButton = new JButton("Search Item");
-	    searchItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18)); // Fixed: PLAIN not PLAN
-	    bottomPanel.add(searchItemButton); // Fixed: bottomPanel not buttonBatch
+	    searchItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    bottomPanel.add(searchItemButton);
 
 	    // Search Item Button Logic
 	    searchItemButton.addActionListener(e -> { 
@@ -464,7 +459,7 @@ public class Dashboard
 
 	        } catch (Exception ex) {
 	            ex.printStackTrace();
-	            JOptionPane.showMessageDialog(inventoryWindow, "Error searching items: " + ex.getMessage()); // Fixed: inventoryWindow
+	            JOptionPane.showMessageDialog(inventoryWindow, "Error searching items: " + ex.getMessage());
 	        }
 	    });
 	    
@@ -627,34 +622,274 @@ public class Dashboard
 	            JOptionPane.showMessageDialog(inventoryWindow, "Error filtering items: " + ex.getMessage());
 	        }
 	    });
+
+        
+        JButton organizeButton = new JButton("Organize Items");
+        organizeButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        bottomPanel.add(organizeButton);
+
+        JPopupMenu organizeMenu = new JPopupMenu();
+        JMenuItem byCategoryItem = new JMenuItem("By Category");
+        JMenuItem bySizeItem = new JMenuItem("By Size"); 
+        JMenuItem byColourItem = new JMenuItem("By Colour");
+        JMenuItem byPriceItem = new JMenuItem("By Price");
+        JMenuItem bySupplierItem = new JMenuItem("View by Supplier");
+
+        organizeMenu.add(byCategoryItem);
+        organizeMenu.add(bySizeItem);
+        organizeMenu.add(byColourItem);
+        organizeMenu.add(byPriceItem);
+        organizeMenu.add(bySupplierItem);
+
+       
+        organizeButton.addActionListener(e -> {
+            organizeMenu.show(organizeButton, 0, organizeButton.getHeight());
+        });
+
+        // Organize by Category
+        byCategoryItem.addActionListener(e -> {
+            try {
+                Inventory inventory = new Inventory();
+                List<Item> organizedItems = inventory.organizeByCategory();
+                
+                DefaultTableModel model = new DefaultTableModel(
+                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                );
+
+                for (Item item : organizedItems) {
+                    model.addRow(new Object[]{
+                        item.getItemId(),
+                        item.getName(),
+                        item.getCategory(),
+                        item.getSize(),
+                        item.getColour(),
+                        item.getQuantity(),
+                        item.getPrice(),
+                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+                    });
+                }
+
+                table.setModel(model);
+                highlightLowStock(table);
+                JOptionPane.showMessageDialog(inventoryWindow, "Items organized by category!");
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(inventoryWindow, "Error organizing by category: " + ex.getMessage());
+            }
+        });
+
+        // Organize by Size
+        bySizeItem.addActionListener(e -> {
+            try {
+                Inventory inventory = new Inventory();
+                List<Item> organizedItems = inventory.organizeBySize();
+                
+                DefaultTableModel model = new DefaultTableModel(
+                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                );
+
+                for (Item item : organizedItems) {
+                    model.addRow(new Object[]{
+                        item.getItemId(),
+                        item.getName(),
+                        item.getCategory(),
+                        item.getSize(),
+                        item.getColour(),
+                        item.getQuantity(),
+                        item.getPrice(),
+                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+                    });
+                }
+
+                table.setModel(model);
+                highlightLowStock(table);
+                JOptionPane.showMessageDialog(inventoryWindow, "Items organized by size!");
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(inventoryWindow, "Error organizing by size: " + ex.getMessage());
+            }
+        });
+
+        // Organize by Colour
+        byColourItem.addActionListener(e -> {
+            try {
+                Inventory inventory = new Inventory();
+                List<Item> organizedItems = inventory.organizeByColour();
+                
+                DefaultTableModel model = new DefaultTableModel(
+                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                );
+
+                for (Item item : organizedItems) {
+                    model.addRow(new Object[]{
+                        item.getItemId(),
+                        item.getName(),
+                        item.getCategory(),
+                        item.getSize(),
+                        item.getColour(),
+                        item.getQuantity(),
+                        item.getPrice(),
+                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+                    });
+                }
+
+                table.setModel(model);
+                highlightLowStock(table);
+                JOptionPane.showMessageDialog(inventoryWindow, "Items organized by colour!");
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(inventoryWindow, "Error organizing by colour: " + ex.getMessage());
+            }
+        });
+
+        // Organize by Price
+        byPriceItem.addActionListener(e -> {
+            try {
+                Inventory inventory = new Inventory();
+                List<Item> organizedItems = inventory.organizeByPrice();
+                
+                DefaultTableModel model = new DefaultTableModel(
+                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                );
+
+                for (Item item : organizedItems) {
+                    model.addRow(new Object[]{
+                        item.getItemId(),
+                        item.getName(),
+                        item.getCategory(),
+                        item.getSize(),
+                        item.getColour(),
+                        item.getQuantity(),
+                        item.getPrice(),
+                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+                    });
+                }
+
+                table.setModel(model);
+                highlightLowStock(table);
+                JOptionPane.showMessageDialog(inventoryWindow, "Items organized by price!");
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(inventoryWindow, "Error organizing by price: " + ex.getMessage());
+            }
+        });
+
+        // View by Supplier
+        bySupplierItem.addActionListener(e -> {
+            try {
+                String supplierName = JOptionPane.showInputDialog(
+                    inventoryWindow, 
+                    "Enter supplier name to view items:",
+                    "View by Supplier",
+                    JOptionPane.QUESTION_MESSAGE
+                );
+                
+                if (supplierName == null || supplierName.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(inventoryWindow, "No supplier name entered.");
+                    return;
+                }
+
+                Inventory inventory = new Inventory();
+                List<Item> supplierItems = new ArrayList<>();
+                
+                // Get items by supplier from database
+                String sql = "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+                             "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id " +
+                             "WHERE s.name LIKE ? " +
+                             "ORDER BY i.itemName";
+                
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    
+                    stmt.setString(1, "%" + supplierName.trim() + "%");
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        while (rs.next()) {
+                            Supplier supplier = null;
+                            int supplierId = rs.getInt("supplier_id");
+                            
+                            if (!rs.wasNull()) {
+                                supplier = new Supplier(
+                                    supplierId,
+                                    rs.getString("supplierName"),
+                                    rs.getString("supplierContact")
+                                );
+                            }
+
+                            Item item = new Item(
+                                rs.getInt("itemId"),
+                                rs.getString("itemName"),
+                                rs.getString("category"),
+                                rs.getString("size"),
+                                rs.getString("colour"),
+                                rs.getDouble("price"),
+                                rs.getInt("quantity"),
+                                supplier
+                            );
+
+                            supplierItems.add(item);
+                        }
+                    }
+                }
+                
+                if (supplierItems.isEmpty()) {
+                    JOptionPane.showMessageDialog(inventoryWindow, 
+                        "No items found for supplier: " + supplierName + "\nOr supplier does not exist.",
+                        "No Items Found",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
+                DefaultTableModel model = new DefaultTableModel(
+                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                );
+
+                for (Item item : supplierItems) {
+                    model.addRow(new Object[]{
+                        item.getItemId(),
+                        item.getName(),
+                        item.getCategory(),
+                        item.getSize(),
+                        item.getColour(),
+                        item.getQuantity(),
+                        item.getPrice(),
+                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+                    });
+                }
+
+                table.setModel(model);
+                highlightLowStock(table);
+                JOptionPane.showMessageDialog(inventoryWindow, 
+                    "Found " + supplierItems.size() + " item(s) from supplier: " + supplierName);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(inventoryWindow, "Error viewing supplier items: " + ex.getMessage());
+            }
+        });
     }
     
-    
-    
     private void highlightLowStock(JTable table) {
-        // Set a custom cell for all cells in the table
         table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
-
             @Override
             public Component getTableCellRendererComponent(
                     JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-                // Get the default rendering behavior for the cell
                 Component c = super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, column);
 
                 int quantityColumn = 5;
                 try {
-                    // Try to read the quantity value from the current row
                     int qty = Integer.parseInt(tbl.getValueAt(row, quantityColumn).toString());
                     
-                    // If quantity < 20  highlight the row in light red low stock warning
                     if (qty < 20) {
                         c.setBackground(new Color(255, 102, 102)); 
                     } else {
                         c.setBackground(Color.WHITE);
                     }
                 } catch (Exception e) {
-                    // If something goes wrong  keep white
                     c.setBackground(Color.WHITE);
                 }
 
@@ -662,7 +897,6 @@ public class Dashboard
                     c.setBackground(new Color(184, 207, 229));
                 }
 
-                // Return the modified cell component to display
                 return c;
             }
         });
@@ -713,7 +947,3 @@ public class Dashboard
 	    new Dashboard();
 	}
 }
-	
-
-	
-
