@@ -863,6 +863,145 @@ assertFalse("Should find items across multiple fields", results.isEmpty());
 assertEquals("Blue", results.get(0).getColour());
 }
 
+/*  ORGANIZATION TESTS */
+//Test #: 61
+//Obj: Test organizeByCategory returns items sorted by category
+//Input(s): None
+//Expected Output: List of items sorted by category then name
+public void testOrganizeByCategory() {
+  List<Item> result = inventory.organizeByCategory();
+  assertNotNull("Category organized list should not be null", result);
+  for (int i = 0; i < result.size() - 1; i++) {
+      String currentCategory = result.get(i).getCategory();
+      String nextCategory = result.get(i + 1).getCategory();
+      assertTrue("Categories should be in ascending order", currentCategory.compareTo(nextCategory) <= 0);
+  }
+}
+
+//Test #: 62
+//Obj: Test organizeBySize returns items in correct size order
+//Input(s): None
+//Expected Output: List of items sorted by size (XS, S, M, L, XL, XXL, XXXL)
+public void testOrganizeBySize() {
+  List<Item> result = inventory.organizeBySize();
+  assertNotNull("Size organized list should not be null", result);
+  String[] sizeOrder = {"XS", "S", "M", "L", "XL", "XXL", "XXXL"};
+  for (int i = 0; i < result.size() - 1; i++) {
+      String currentSize = result.get(i).getSize().toUpperCase();
+      String nextSize = result.get(i + 1).getSize().toUpperCase();
+      int currentIndex = java.util.Arrays.asList(sizeOrder).indexOf(currentSize);
+      int nextIndex = java.util.Arrays.asList(sizeOrder).indexOf(nextSize);
+      if (currentIndex == -1) currentIndex = sizeOrder.length;
+      if (nextIndex == -1) nextIndex = sizeOrder.length;
+      assertTrue("Sizes should follow logical order", currentIndex <= nextIndex);
+  }
+}
+
+//Test #: 63
+//Obj: Test organizeByColour returns items sorted by colour
+//Input(s): None
+//Expected Output: List of items sorted by colour then name
+public void testOrganizeByColour() {
+  List<Item> result = inventory.organizeByColour();
+  assertNotNull("Colour organized list should not be null", result);
+  for (int i = 0; i < result.size() - 1; i++) {
+      String currentColour = result.get(i).getColour();
+      String nextColour = result.get(i + 1).getColour();
+      assertTrue("Colours should be in ascending order", currentColour.compareTo(nextColour) <= 0);
+  }
+}
+
+//Test #: 64
+//Obj: Test organizeByPrice returns items sorted by price
+//Input(s): None
+//Expected Output: List of items sorted by price then name
+public void testOrganizeByPrice() {
+  List<Item> result = inventory.organizeByPrice();
+  assertNotNull("Price organized list should not be null", result);
+  for (int i = 0; i < result.size() - 1; i++) {
+      double currentPrice = result.get(i).getPrice();
+      double nextPrice = result.get(i + 1).getPrice();
+      assertTrue("Prices should be in ascending order", currentPrice <= nextPrice);
+  }
+}
+
+//Test #: 65
+//Obj: Test getItemVariations with valid item name returns all variations
+//Input(s): itemName = "T-Shirt"
+//Expected Output: List of all T-Shirt variations with different sizes/colours
+public void testGetItemVariationsValidName() {
+  List<Item> variations = inventory.getItemVariations("T-Shirt");
+  assertNotNull("Variations list should not be null", variations);
+  for (Item item : variations) {
+      assertEquals("All variations should have same name", "T-Shirt", item.getName());
+  }
+}
+
+//Test #: 66
+//Obj: Test getItemVariations with non-existent item name
+//Input(s): itemName = "NonExistentItem"
+//Expected Output: Empty list
+public void testGetItemVariationsNonExistentName() {
+  List<Item> variations = inventory.getItemVariations("NonExistentItem");
+  assertNotNull("Should return empty list, not null", variations);
+  assertTrue("Should return empty list for non-existent item", variations.isEmpty());
+}
+
+//Test #: 67
+//Obj: Test getItemVariations with null item name
+//Input(s): itemName = null
+//Expected Output: Empty list
+public void testGetItemVariationsNullName() {
+  List<Item> variations = inventory.getItemVariations(null);
+  assertNotNull("Should return empty list, not null", variations);
+  assertTrue("Should return empty list for null name", variations.isEmpty());
+}
+
+//Test #: 68
+//Obj: Test all organization methods return consistent item counts
+//Input(s): None
+//Expected Output: All organization methods return same number of items
+public void testOrganizationMethodsConsistentCounts() {
+  List<Item> byCategory = inventory.organizeByCategory();
+  List<Item> bySize = inventory.organizeBySize();
+  List<Item> byColour = inventory.organizeByColour();
+  List<Item> byPrice = inventory.organizeByPrice();
+  assertEquals("All organization methods should return same number of items", byCategory.size(), bySize.size());
+  assertEquals("All organization methods should return same number of items", byCategory.size(), byColour.size());
+  assertEquals("All organization methods should return same number of items", byCategory.size(), byPrice.size());
+}
+
+//Test #: 69
+//Obj: Test organization methods handle empty database gracefully
+//Input(s): None (empty database)
+//Expected Output: All methods return empty lists without errors
+public void testOrganizationMethodsEmptyDatabase() throws SQLException {
+  Connection conn = DatabaseConnection.getConnection();
+  Statement stmt = conn.createStatement();
+  stmt.executeUpdate("DELETE FROM items");
+  stmt.close();
+  assertTrue("Category should be empty", inventory.organizeByCategory().isEmpty());
+  assertTrue("Size should be empty", inventory.organizeBySize().isEmpty());
+  assertTrue("Colour should be empty", inventory.organizeByColour().isEmpty());
+  assertTrue("Price should be empty", inventory.organizeByPrice().isEmpty());
+}
+
+//Test #: 70
+//Obj: Test item variations maintain same supplier across variations
+//Input(s): itemName = "T-Shirt"
+//Expected Output: All variations should have consistent supplier data
+public void testItemVariationsConsistentSupplier() {
+  List<Item> variations = inventory.getItemVariations("T-Shirt");
+  if (!variations.isEmpty() && variations.get(0).getSupplier() != null) {
+      int firstSupplierId = variations.get(0).getSupplier().getSupplierId();
+      for (Item item : variations) {
+          if (item.getSupplier() != null) {
+              assertEquals("Suppliers should be consistent across variations", firstSupplierId, item.getSupplier().getSupplierId());
+          }
+      }
+  }
+}
+
 
 
     
