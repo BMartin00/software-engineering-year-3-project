@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class DatabaseConnection
 {
-    private static final String URL = "jdbc:mysql://localhost:3306/clothing_inventory?serverTimezone=GMT";
+    private static final String URL = "jdbc:mysql://localhost:3307/clothing_inventory?serverTimezone=GMT";
     private static final String USER = "root";
-    private static final String PASSWORD = "admin";
+    private static final String PASSWORD = "";
 
     private static Connection conn;
 
