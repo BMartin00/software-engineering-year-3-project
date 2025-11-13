@@ -629,11 +629,8 @@ public class Inventory
         }
         return lowStock;
     }
-    
     public boolean recordSale(int itemId, int quantitySold) {
         if (quantitySold <= 0) {
-            if (!testMode)
-                JOptionPane.showMessageDialog(null, "Quantity sold must be greater than zero.");
             return false;
         }
 
@@ -646,12 +643,11 @@ public class Inventory
                 checkStmt.setInt(1, itemId);
                 ResultSet rs = checkStmt.executeQuery();
                 if (!rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Item not found.");
                     return false;
                 }
                 int currentStock = rs.getInt("quantity");
                 if (currentStock < quantitySold) {
-                    JOptionPane.showMessageDialog(null, "Not enough stock available. Current stock: " + currentStock);
+                    // Not enough stock, return false
                     return false;
                 }
             }
@@ -673,15 +669,14 @@ public class Inventory
             }
 
             conn.commit();
-            JOptionPane.showMessageDialog(null, "Sale recorded successfully! Stock updated.");
             return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
             return false;
         }
     }
+
 
 
 	public Report generateReport(String format)
