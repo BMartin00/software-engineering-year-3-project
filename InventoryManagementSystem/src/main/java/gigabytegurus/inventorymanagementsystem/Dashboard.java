@@ -523,6 +523,77 @@ public class Dashboard
 	    // Add the delete button to the bottom panel
 	    bottomPanel.add(deleteButton);
 	    
+	 // RECORD SALE BUTTON
+	    JButton recordSaleButton = new JButton("Record Sale");
+	    recordSaleButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    bottomPanel.add(recordSaleButton);
+
+	    recordSaleButton.addActionListener(e -> {
+	        try {
+	            String idInput = JOptionPane.showInputDialog(
+	                inventoryWindow,
+	                "Enter the ID of the item sold:",
+	                "Record Sale",
+	                JOptionPane.QUESTION_MESSAGE
+	            );
+
+	            if (idInput == null || idInput.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No ID entered. Operation cancelled.");
+	                return;
+	            }
+
+	            int itemId = Integer.parseInt(idInput.trim());
+
+	            String qtyInput = JOptionPane.showInputDialog(
+	                inventoryWindow,
+	                "Enter quantity sold:",
+	                "Record Sale",
+	                JOptionPane.QUESTION_MESSAGE
+	            );
+
+	            if (qtyInput == null || qtyInput.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No quantity entered. Operation cancelled.");
+	                return;
+	            }
+
+	            int quantitySold = Integer.parseInt(qtyInput.trim());
+
+	            Inventory inventory = new Inventory();
+	            boolean success = inventory.recordSale(itemId, quantitySold);
+
+	            if (success) {
+	                // Refresh the table
+	                List<Item> updatedItems = loadItemsFromDatabase();
+	                DefaultTableModel model = new DefaultTableModel(
+	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+	                );
+
+	                for (Item item : updatedItems) {
+	                    model.addRow(new Object[]{
+	                        item.getItemId(),
+	                        item.getName(),
+	                        item.getCategory(),
+	                        item.getSize(),
+	                        item.getColour(),
+	                        item.getQuantity(),
+	                        item.getPrice(),
+	                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+	                    });
+	                }
+
+	                table.setModel(model);
+	                highlightLowStock(table);
+	            }
+
+	        } catch (NumberFormatException ex) {
+	            JOptionPane.showMessageDialog(inventoryWindow, "Invalid number entered. Please try again.");
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(inventoryWindow, "Error recording sale: " + ex.getMessage());
+	        }
+	    });
+
+	    
 	    
 	    //Filter 
 	    JButton filterButton = new JButton("Filter Items");

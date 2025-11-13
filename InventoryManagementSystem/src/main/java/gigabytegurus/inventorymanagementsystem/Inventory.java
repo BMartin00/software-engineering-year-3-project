@@ -629,6 +629,60 @@ public class Inventory
         }
         return lowStock;
     }
+    
+    public boolean recordSale(int itemId, int quantitySold) {
+        if (quantitySold <= 0) {
+            if (!testMode)
+                JOptionPane.showMessageDialog(null, "Quantity sold must be greater than zero.");
+            return false;
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+
+            // Check stock
+            String checkSQL = "SELECT quantity FROM items WHERE itemId = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSQL)) {
+                checkStmt.setInt(1, itemId);
+                ResultSet rs = checkStmt.executeQuery();
+                if (!rs.next()) {
+                    JOptionPane.showMessageDialog(null, "Item not found.");
+                    return false;
+                }
+                int currentStock = rs.getInt("quantity");
+                if (currentStock < quantitySold) {
+                    JOptionPane.showMessageDialog(null, "Not enough stock available. Current stock: " + currentStock);
+                    return false;
+                }
+            }
+
+            // Record sale
+            String insertSQL = "INSERT INTO sales (item_id, quantity_sold) VALUES (?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(insertSQL)) {
+                stmt.setInt(1, itemId);
+                stmt.setInt(2, quantitySold);
+                stmt.executeUpdate();
+            }
+
+            // Update stock
+            String updateSQL = "UPDATE items SET quantity = quantity - ? WHERE itemId = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(updateSQL)) {
+                stmt.setInt(1, quantitySold);
+                stmt.setInt(2, itemId);
+                stmt.executeUpdate();
+            }
+
+            conn.commit();
+            JOptionPane.showMessageDialog(null, "Sale recorded successfully! Stock updated.");
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 	public Report generateReport(String format)
 	{

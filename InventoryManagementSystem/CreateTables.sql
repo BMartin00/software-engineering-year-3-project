@@ -43,6 +43,16 @@ CREATE TABLE items (
     FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
 );
 
+
+-- Sales table 
+CREATE TABLE sales (
+    sale_id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    quantity_sold INT NOT NULL CHECK (quantity_sold > 0),
+    sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (item_id) REFERENCES items(itemId)
+);
+
 -- Insert sample items
 INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_id) VALUES
 ('T-Shirt', 'Clothing', 'M', 'Red', 19.99, 50, 1),
@@ -53,3 +63,4 @@ INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_i
 SELECT * FROM users;
 SELECT * FROM items;
 SELECT * FROM suppliers;
+SELECT * FROM sales;
