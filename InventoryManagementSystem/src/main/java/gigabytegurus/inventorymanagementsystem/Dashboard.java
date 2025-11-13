@@ -558,8 +558,8 @@ public class Dashboard
 
 	            int quantitySold = Integer.parseInt(qtyInput.trim());
 
-	            Inventory inventory = new Inventory();
-	            boolean success = inventory.recordSale(itemId, quantitySold);
+	            // Record the sale via Transaction class
+	            boolean success = Transaction.recordSale(itemId, quantitySold);
 
 	            if (success) {
 	                // Refresh the table
@@ -583,6 +583,8 @@ public class Dashboard
 
 	                table.setModel(model);
 	                highlightLowStock(table);
+	            } else {
+	                JOptionPane.showMessageDialog(inventoryWindow, "Sale could not be recorded. Check item ID or stock quantity.");
 	            }
 
 	        } catch (NumberFormatException ex) {
@@ -592,6 +594,7 @@ public class Dashboard
 	            JOptionPane.showMessageDialog(inventoryWindow, "Error recording sale: " + ex.getMessage());
 	        }
 	    });
+
 
 	    
 	    

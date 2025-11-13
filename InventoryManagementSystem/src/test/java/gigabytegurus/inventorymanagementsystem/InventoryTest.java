@@ -997,7 +997,7 @@ public class InventoryTest extends TestCase{
 	        initialQuantity = getQuantity(conn, itemId);
 	    }
 
-	    boolean result = inventory.recordSale(itemId, 5);
+	    boolean result = Transaction.recordSale(itemId, 5);
 	    assertTrue("Sale should succeed", result);
 
 	    try (Connection conn = DatabaseConnection.getConnection()) {
@@ -1017,7 +1017,7 @@ public class InventoryTest extends TestCase{
 	        initialQuantity = getQuantity(conn, itemId);
 	    }
 
-	    boolean result = inventory.recordSale(itemId, 1000);
+	    boolean result = Transaction.recordSale(itemId, 1000);
 	    assertFalse("Sale exceeding stock should fail", result);
 
 	    try (Connection conn = DatabaseConnection.getConnection()) {
@@ -1037,7 +1037,7 @@ public class InventoryTest extends TestCase{
 	        initialQuantity = getQuantity(conn, itemId);
 	    }
 
-	    boolean result = inventory.recordSale(itemId, -5);
+	    boolean result = Transaction.recordSale(itemId, -5);
 	    assertFalse("Sale with negative quantity should fail", result);
 
 	    try (Connection conn = DatabaseConnection.getConnection()) {
@@ -1057,7 +1057,7 @@ public class InventoryTest extends TestCase{
 	        initialQuantity = getQuantity(conn, itemId);
 	    }
 
-	    boolean result = inventory.recordSale(itemId, 0);
+	    boolean result = Transaction.recordSale(itemId, 0);
 	    assertFalse("Sale with zero quantity should fail", result);
 
 	    try (Connection conn = DatabaseConnection.getConnection()) {
@@ -1071,7 +1071,7 @@ public class InventoryTest extends TestCase{
 	//Input(s): itemId = 99999, quantitySold = 5
 	//Expected Output: Returns false
 	public void testRecordSaleNonExistentItem() {
-	    boolean result = inventory.recordSale(99999, 5);
+	    boolean result = Transaction.recordSale(99999, 5);
 	    assertFalse("Sale for non-existent item should fail", result);
 	}
 
@@ -1086,8 +1086,8 @@ public class InventoryTest extends TestCase{
 	        initialQuantity = getQuantity(conn, itemId);
 	    }
 
-	    boolean result1 = inventory.recordSale(itemId, 5);
-	    boolean result2 = inventory.recordSale(itemId, 3);
+	    boolean result1 = Transaction.recordSale(itemId, 5);
+	    boolean result2 = Transaction.recordSale(itemId, 3);
 
 	    assertTrue(result1 && result2);
 
