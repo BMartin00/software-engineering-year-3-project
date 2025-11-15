@@ -307,6 +307,47 @@ public class Transaction
 	    }
 	    return history.toString();
 	}
+	
+	// Get overall sales summary
+	public static String getSalesSummary() {
+	    StringBuilder summary = new StringBuilder();
+	    String sql = "SELECT i.itemName, SUM(s.quantity_sold) as total_sold, " +
+	                "SUM(s.quantity_sold * i.price) as total_revenue " +
+	                "FROM sales s " +
+	                "JOIN items i ON s.item_id = i.itemId " +
+	                "GROUP BY i.itemId, i.itemName " +
+	                "ORDER BY total_revenue DESC";
+	
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+	
+	        summary.append("=== SALES SUMMARY ===\n\n");
+	        double grandTotalRevenue = 0;
+	        int grandTotalQuantity = 0;
+	        
+	        while (rs.next()) {
+	            int totalSold = rs.getInt("total_sold");
+	            double totalRevenue = rs.getDouble("total_revenue");
+	            
+	            summary.append("Item: ").append(rs.getString("itemName"))
+	                  .append(" | Total Sold: ").append(totalSold)
+	                  .append(" | Total Revenue: €").append(String.format("%.2f", totalRevenue))
+	                  .append("\n");
+	                  
+	            grandTotalQuantity += totalSold;
+	            grandTotalRevenue += totalRevenue;
+	        }
+	        
+	        summary.append("\n=== GRAND TOTAL ===\n");
+	        summary.append("Total Items Sold: ").append(grandTotalQuantity).append("\n");
+	        summary.append("Total Revenue: €").append(String.format("%.2f", grandTotalRevenue)).append("\n");
+	        
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return summary.toString();
+	}
 
 	
 	public void processReturn()
