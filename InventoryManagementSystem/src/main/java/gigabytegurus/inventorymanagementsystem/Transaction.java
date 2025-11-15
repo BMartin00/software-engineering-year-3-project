@@ -223,6 +223,38 @@ public class Transaction
         }
         return history.toString();
     }
+    
+    // Get exchange history for an item
+    public static String getExchangeHistory(int itemId) {
+        StringBuilder history = new StringBuilder();
+        String sql = "SELECT e.exchange_date, e.returned_quantity, e.new_quantity, e.reason, " +
+                    "ri.itemName as returnedItem, ni.itemName as newItem " +
+                    "FROM item_exchanges e " +
+                    "JOIN items ri ON e.returned_item_id = ri.itemId " +
+                    "JOIN items ni ON e.new_item_id = ni.itemId " +
+                    "WHERE e.returned_item_id = ? OR e.new_item_id = ? " +
+                    "ORDER BY e.exchange_date DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, itemId);
+            stmt.setInt(2, itemId);
+            ResultSet rs = stmt.executeQuery();
+
+            history.append("=== EXCHANGE HISTORY ===\n");
+            while (rs.next()) {
+                history.append("Date: ").append(rs.getTimestamp("exchange_date"))
+                      .append(" | Returned: ").append(rs.getInt("returned_quantity")).append(" ").append(rs.getString("returnedItem"))
+                      .append(" | New: ").append(rs.getInt("new_quantity")).append(" ").append(rs.getString("newItem"))
+                      .append(" | Reason: ").append(rs.getString("reason"))
+                      .append("\n");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return history.toString();
+    }
 
 	
 	public void processReturn()
