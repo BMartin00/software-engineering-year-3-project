@@ -909,6 +909,28 @@ public class Dashboard
 		    }
 		});
 	    
+		// VIEW OVERALL SALES SUMMARY BUTTON
+		JButton viewSalesSummaryButton = new JButton("Sales Summary");
+		viewSalesSummaryButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		bottomPanel.add(viewSalesSummaryButton);
+		
+		viewSalesSummaryButton.addActionListener(e -> {
+		    try {
+		        String summary = Transaction.getSalesSummary();
+		        
+		        JTextArea textArea = new JTextArea(20, 60);
+		        textArea.setText(summary);
+		        textArea.setEditable(false);
+		        
+		        JScrollPane salesSummaryScrollPane = new JScrollPane(textArea);
+		        JOptionPane.showMessageDialog(inventoryWindow, salesSummaryScrollPane, 
+		            "Overall Sales Summary", JOptionPane.INFORMATION_MESSAGE);
+		
+		    } catch (Exception ex) {
+		        ex.printStackTrace();
+		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving sales summary: " + ex.getMessage());
+		    }
+		});
 	    
 	    //Filter 
 	    JButton filterButton = new JButton("Filter Items");
