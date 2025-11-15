@@ -871,6 +871,43 @@ public class Dashboard
 		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving history: " + ex.getMessage());
 		    }
 		});
+		
+		// VIEW SALES HISTORY BUTTON
+		JButton viewSalesHistoryButton = new JButton("View Sales History");
+		viewSalesHistoryButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		bottomPanel.add(viewSalesHistoryButton);
+		
+		viewSalesHistoryButton.addActionListener(e -> {
+		    try {
+		        String idInput = JOptionPane.showInputDialog(
+		            inventoryWindow,
+		            "Enter item ID to view sales history:",
+		            "View Sales History",
+		            JOptionPane.QUESTION_MESSAGE
+		        );
+		
+		        if (idInput == null || idInput.trim().isEmpty()) {
+		            return;
+		        }
+		
+		        int itemId = Integer.parseInt(idInput.trim());
+		        String history = Transaction.getSalesHistory(itemId);
+		        
+		        JTextArea textArea = new JTextArea(20, 60);
+		        textArea.setText(history);
+		        textArea.setEditable(false);
+		        
+		        JScrollPane salesHistoryScrollPane = new JScrollPane(textArea);
+		        JOptionPane.showMessageDialog(inventoryWindow, salesHistoryScrollPane, 
+		            "Sales History for Item ID: " + itemId, JOptionPane.INFORMATION_MESSAGE);
+		
+		    } catch (NumberFormatException ex) {
+		        JOptionPane.showMessageDialog(inventoryWindow, "Invalid item ID.");
+		    } catch (Exception ex) {
+		        ex.printStackTrace();
+		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving sales history: " + ex.getMessage());
+		    }
+		});
 	    
 	    
 	    //Filter 
