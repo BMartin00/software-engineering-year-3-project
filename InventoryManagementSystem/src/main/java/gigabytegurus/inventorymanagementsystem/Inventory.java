@@ -629,6 +629,8 @@ public class Inventory
         }
         return lowStock;
     }
+    
+
 
 	public Report generateReport(String format)
 	{
