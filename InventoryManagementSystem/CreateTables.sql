@@ -88,4 +88,4 @@ SELECT * FROM items;
 SELECT * FROM suppliers;
 SELECT * FROM sales;
 SELECT * FROM item_returns;
-SELECT * FROM exchanges;
+SELECT * FROM item_exchanges;
