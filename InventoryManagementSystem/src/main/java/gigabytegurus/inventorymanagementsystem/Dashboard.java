@@ -797,7 +797,42 @@ public class Dashboard
 	        }
 	    });
 
-
+	    // VIEW RETURN HISTORY BUTTON
+		JButton viewReturnHistoryButton = new JButton("View Return History");
+		viewReturnHistoryButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		bottomPanel.add(viewReturnHistoryButton);
+		
+		viewReturnHistoryButton.addActionListener(e -> {
+		    try {
+		        String idInput = JOptionPane.showInputDialog(
+		            inventoryWindow,
+		            "Enter item ID to view return history:",
+		            "View Return History",
+		            JOptionPane.QUESTION_MESSAGE
+		        );
+		
+		        if (idInput == null || idInput.trim().isEmpty()) {
+		            return;
+		        }
+		
+		        int itemId = Integer.parseInt(idInput.trim());
+		        String history = Transaction.getReturnHistory(itemId);
+		        
+		        JTextArea textArea = new JTextArea(20, 50);
+		        textArea.setText(history);
+		        textArea.setEditable(false);
+		        
+		        JScrollPane returnHistoryScrollPane = new JScrollPane(textArea);
+		        JOptionPane.showMessageDialog(inventoryWindow, returnHistoryScrollPane, 
+		            "Return History for Item ID: " + itemId, JOptionPane.INFORMATION_MESSAGE);
+		
+		    } catch (NumberFormatException ex) {
+		        JOptionPane.showMessageDialog(inventoryWindow, "Invalid item ID.");
+		    } catch (Exception ex) {
+		        ex.printStackTrace();
+		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving history: " + ex.getMessage());
+		    }
+		});
 	    
 	    
 	    //Filter 
