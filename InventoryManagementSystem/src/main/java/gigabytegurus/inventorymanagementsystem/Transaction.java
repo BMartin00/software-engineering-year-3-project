@@ -193,6 +193,36 @@ public class Transaction
             return false;
         }
     }
+    
+    // Get return history for an item
+    public static String getReturnHistory(int itemId) {
+        StringBuilder history = new StringBuilder();
+        String sql = "SELECT r.return_date, r.quantity_returned, r.reason, " +
+                    "i.itemName " +
+                    "FROM item_returns r " +
+                    "JOIN items i ON r.item_id = i.itemId " +
+                    "WHERE r.item_id = ? " +
+                    "ORDER BY r.return_date DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, itemId);
+            ResultSet rs = stmt.executeQuery();
+
+            history.append("=== RETURN HISTORY ===\n");
+            while (rs.next()) {
+                history.append("Date: ").append(rs.getTimestamp("return_date"))
+                      .append(" | Quantity: ").append(rs.getInt("quantity_returned"))
+                      .append(" | Item: ").append(rs.getString("itemName"))
+                      .append(" | Reason: ").append(rs.getString("reason"))
+                      .append("\n");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return history.toString();
+    }
 
 	
 	public void processReturn()
