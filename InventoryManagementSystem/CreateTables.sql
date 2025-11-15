@@ -70,9 +70,22 @@ CREATE TABLE item_returns (
     FOREIGN KEY (item_id) REFERENCES items(itemId)
 );
 
+-- Item_Exchanges table for item swaps
+CREATE TABLE item_exchanges (
+    exchange_id INT AUTO_INCREMENT PRIMARY KEY,
+    returned_item_id INT NOT NULL,
+    returned_quantity INT NOT NULL CHECK (returned_quantity > 0),
+    new_item_id INT NOT NULL,
+    new_quantity INT NOT NULL CHECK (new_quantity > 0),
+    exchange_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reason VARCHAR(255),
+    FOREIGN KEY (returned_item_id) REFERENCES items(itemId),
+    FOREIGN KEY (new_item_id) REFERENCES items(itemId)
+);
 
 SELECT * FROM users;
 SELECT * FROM items;
 SELECT * FROM suppliers;
 SELECT * FROM sales;
 SELECT * FROM item_returns;
+SELECT * FROM exchanges;
