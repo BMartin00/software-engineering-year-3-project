@@ -833,6 +833,44 @@ public class Dashboard
 		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving history: " + ex.getMessage());
 		    }
 		});
+		
+		// VIEW EXCHANGE HISTORY BUTTON
+		JButton viewExchangeHistoryButton = new JButton("View Exchange History");
+		viewExchangeHistoryButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		bottomPanel.add(viewExchangeHistoryButton);
+		
+		viewExchangeHistoryButton.addActionListener(e -> {
+		    try {
+		        String idInput = JOptionPane.showInputDialog(
+		            inventoryWindow,
+		            "Enter item ID to view exchange history:",
+		            "View Exchange History",
+		            JOptionPane.QUESTION_MESSAGE
+		        );
+		
+		        if (idInput == null || idInput.trim().isEmpty()) {
+		            return;
+		        }
+		
+		        int itemId = Integer.parseInt(idInput.trim());
+		        String history = Transaction.getExchangeHistory(itemId);
+		        
+		        JTextArea textArea = new JTextArea(20, 50);
+		        textArea.setText(history);
+		        textArea.setEditable(false);
+		        
+		        // Use different variable name - exchangeHistoryScrollPane
+		        JScrollPane exchangeHistoryScrollPane = new JScrollPane(textArea);
+		        JOptionPane.showMessageDialog(inventoryWindow, exchangeHistoryScrollPane, 
+		            "Exchange History for Item ID: " + itemId, JOptionPane.INFORMATION_MESSAGE);
+		
+		    } catch (NumberFormatException ex) {
+		        JOptionPane.showMessageDialog(inventoryWindow, "Invalid item ID.");
+		    } catch (Exception ex) {
+		        ex.printStackTrace();
+		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving history: " + ex.getMessage());
+		    }
+		});
 	    
 	    
 	    //Filter 
