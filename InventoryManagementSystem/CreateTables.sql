@@ -60,7 +60,19 @@ INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_i
 ('Sneakers', 'Footwear', '42', 'White', 89.99, 20, 2),
 ('Jacket', 'Outerwear', 'XL', 'Black', 99.50, 15, 2);
 
+-- Item_Returns table for simple returns
+CREATE TABLE item_returns (
+    return_id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    quantity_returned INT NOT NULL CHECK (quantity_returned > 0),
+    return_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reason VARCHAR(255),
+    FOREIGN KEY (item_id) REFERENCES items(itemId)
+);
+
+
 SELECT * FROM users;
 SELECT * FROM items;
 SELECT * FROM suppliers;
 SELECT * FROM sales;
+SELECT * FROM item_returns;
