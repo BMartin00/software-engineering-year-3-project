@@ -682,6 +682,120 @@ public class Dashboard
 		        JOptionPane.showMessageDialog(inventoryWindow, "Error processing return: " + ex.getMessage());
 		    }
 		});
+		
+		// PROCESS EXCHANGE BUTTON
+	    JButton processExchangeButton = new JButton("Process Exchange");
+	    processExchangeButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    bottomPanel.add(processExchangeButton);
+	
+	    processExchangeButton.addActionListener(e -> {
+	        try {
+	            // Get return details
+	            String returnIdInput = JOptionPane.showInputDialog(
+	                inventoryWindow,
+	                "Enter the ID of the item being returned:",
+	                "Process Exchange - Return Item",
+	                JOptionPane.QUESTION_MESSAGE
+	            );
+	
+	            if (returnIdInput == null || returnIdInput.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No return ID entered. Operation cancelled.");
+	                return;
+	            }
+	            int returnedItemId = Integer.parseInt(returnIdInput.trim());
+	
+	            String returnQtyInput = JOptionPane.showInputDialog(
+	                inventoryWindow,
+	                "Enter quantity being returned:",
+	                "Process Exchange - Return Quantity",
+	                JOptionPane.QUESTION_MESSAGE
+	            );
+	
+	            if (returnQtyInput == null || returnQtyInput.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No return quantity entered. Operation cancelled.");
+	                return;
+	            }
+	            int returnedQuantity = Integer.parseInt(returnQtyInput.trim());
+	
+	            // Get exchange details
+	            String exchangeIdInput = JOptionPane.showInputDialog(
+	                inventoryWindow,
+	                "Enter the ID of the new item for exchange:",
+	                "Process Exchange - New Item",
+	                JOptionPane.QUESTION_MESSAGE
+	            );
+	
+	            if (exchangeIdInput == null || exchangeIdInput.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No exchange ID entered. Operation cancelled.");
+	                return;
+	            }
+	            int newItemId = Integer.parseInt(exchangeIdInput.trim());
+	
+	            String exchangeQtyInput = JOptionPane.showInputDialog(
+	                inventoryWindow,
+	                "Enter quantity for new item:",
+	                "Process Exchange - New Quantity",
+	                JOptionPane.QUESTION_MESSAGE
+	            );
+	
+	            if (exchangeQtyInput == null || exchangeQtyInput.trim().isEmpty()) {
+	                JOptionPane.showMessageDialog(inventoryWindow, "No exchange quantity entered. Operation cancelled.");
+	                return;
+	            }
+	            int newItemQuantity = Integer.parseInt(exchangeQtyInput.trim());
+	
+	            String reason = JOptionPane.showInputDialog(
+	                inventoryWindow,
+	                "Enter reason for exchange:",
+	                "Process Exchange - Reason",
+	                JOptionPane.QUESTION_MESSAGE
+	            );
+	
+	            if (reason == null || reason.trim().isEmpty()) {
+	                reason = "No reason provided";
+	            }
+	
+	            // Process the exchange
+	            boolean success = Transaction.processExchange(returnedItemId, returnedQuantity, 
+	                                                         newItemId, newItemQuantity, reason.trim());
+	
+	            if (success) {
+	                // Refresh the table
+	                List<Item> updatedItems = loadItemsFromDatabase();
+	                DefaultTableModel model = new DefaultTableModel(
+	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+	                );
+	
+	                for (Item item : updatedItems) {
+	                    model.addRow(new Object[]{
+	                        item.getItemId(),
+	                        item.getName(),
+	                        item.getCategory(),
+	                        item.getSize(),
+	                        item.getColour(),
+	                        item.getQuantity(),
+	                        item.getPrice(),
+	                        item.getSupplier() != null ? item.getSupplier().getName() : ""
+	                    });
+	                }
+	
+	                table.setModel(model);
+	                highlightLowStock(table);
+	                JOptionPane.showMessageDialog(inventoryWindow, 
+	                    "Exchange processed successfully!\n" + 
+	                    returnedQuantity + " items returned and " + newItemQuantity + " new items issued.");
+	            } else {
+	                JOptionPane.showMessageDialog(inventoryWindow, 
+	                    "Exchange could not be processed. Please check item IDs and stock availability.");
+	            }
+	
+	        } catch (NumberFormatException ex) {
+	            JOptionPane.showMessageDialog(inventoryWindow, "Invalid number entered. Please try again.");
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(inventoryWindow, "Error processing exchange: " + ex.getMessage());
+	        }
+	    });
 
 
 	    
