@@ -594,6 +594,94 @@ public class Dashboard
 	            JOptionPane.showMessageDialog(inventoryWindow, "Error recording sale: " + ex.getMessage());
 	        }
 	    });
+	    
+	    
+	    // PROCESS RETURN BUTTON
+		JButton processReturnButton = new JButton("Process Return");
+		processReturnButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+		bottomPanel.add(processReturnButton);
+		
+		processReturnButton.addActionListener(e -> {
+		    try {
+		        // Get return details
+		        String idInput = JOptionPane.showInputDialog(
+		            inventoryWindow,
+		            "Enter the ID of the item being returned:",
+		            "Process Return",
+		            JOptionPane.QUESTION_MESSAGE
+		        );
+		
+		        if (idInput == null || idInput.trim().isEmpty()) {
+		            JOptionPane.showMessageDialog(inventoryWindow, "No ID entered. Operation cancelled.");
+		            return;
+		        }
+		
+		        int itemId = Integer.parseInt(idInput.trim());
+		
+		        String qtyInput = JOptionPane.showInputDialog(
+		            inventoryWindow,
+		            "Enter quantity being returned:",
+		            "Process Return",
+		            JOptionPane.QUESTION_MESSAGE
+		        );
+		
+		        if (qtyInput == null || qtyInput.trim().isEmpty()) {
+		            JOptionPane.showMessageDialog(inventoryWindow, "No quantity entered. Operation cancelled.");
+		            return;
+		        }
+		
+		        int quantityReturned = Integer.parseInt(qtyInput.trim());
+		
+		        String reason = JOptionPane.showInputDialog(
+		            inventoryWindow,
+		            "Enter reason for return:",
+		            "Process Return - Reason",
+		            JOptionPane.QUESTION_MESSAGE
+		        );
+		
+		        if (reason == null || reason.trim().isEmpty()) {
+		            reason = "No reason provided";
+		        }
+		
+		        // Process the return
+		        boolean success = Transaction.processReturn(itemId, quantityReturned, reason.trim());
+		
+		        if (success) {
+		            // Refresh the table
+		            List<Item> updatedItems = loadItemsFromDatabase();
+		            DefaultTableModel model = new DefaultTableModel(
+		                new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+		            );
+		
+		            for (Item item : updatedItems) {
+		                model.addRow(new Object[]{
+		                    item.getItemId(),
+		                    item.getName(),
+		                    item.getCategory(),
+		                    item.getSize(),
+		                    item.getColour(),
+		                    item.getQuantity(),
+		                    item.getPrice(),
+		                    item.getSupplier() != null ? item.getSupplier().getName() : ""
+		                });
+		            }
+		
+		            table.setModel(model);
+		            highlightLowStock(table);
+		            JOptionPane.showMessageDialog(inventoryWindow, 
+		                "Return processed successfully!\n" + quantityReturned + " items added back to inventory.");
+		        } else {
+		            JOptionPane.showMessageDialog(inventoryWindow, 
+		                "Return could not be processed. Please check the item ID and try again.");
+		        }
+		
+		    } catch (NumberFormatException ex) {
+		        JOptionPane.showMessageDialog(inventoryWindow, "Invalid number entered. Please try again.");
+		    } catch (Exception ex) {
+		        ex.printStackTrace();
+		        JOptionPane.showMessageDialog(inventoryWindow, "Error processing return: " + ex.getMessage());
+		    }
+		});
 
 
 	    
