@@ -255,6 +255,58 @@ public class Transaction
         }
         return history.toString();
     }
+    
+    // Get sales history for an item
+	public static String getSalesHistory(int itemId) {
+		StringBuilder history = new StringBuilder();
+		String sql = "SELECT s.sale_date, s.quantity_sold, " +
+	                "i.itemName, i.price " +
+	                "FROM sales s " +
+	                "JOIN items i ON s.item_id = i.itemId " +
+	                "WHERE s.item_id = ? " +
+	                "ORDER BY s.sale_date DESC";
+	
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        
+	        stmt.setInt(1, itemId);
+	        ResultSet rs = stmt.executeQuery();
+	
+	        history.append("=== SALES HISTORY ===\n");
+	        double totalRevenue = 0;
+	        int totalQuantity = 0;
+	        
+	        while (rs.next()) {
+	            double itemPrice = rs.getDouble("price");
+	            int quantitySold = rs.getInt("quantity_sold");
+	            double saleTotal = itemPrice * quantitySold;
+	            
+	            history.append("Date: ").append(rs.getTimestamp("sale_date"))
+	                  .append(" | Quantity: ").append(quantitySold)
+	                  .append(" | Item: ").append(rs.getString("itemName"))
+	                  .append(" | Price: €").append(String.format("%.2f", itemPrice))
+	                  .append(" | Total: €").append(String.format("%.2f", saleTotal))
+	                  .append("\n");
+	                  
+	            totalQuantity += quantitySold;
+	            totalRevenue += saleTotal;
+	        }
+	        
+	        // Add summary
+	        if (totalQuantity > 0) {
+	            history.append("\n=== SUMMARY ===\n");
+	            history.append("Total Quantity Sold: ").append(totalQuantity).append("\n");
+	            history.append("Total Revenue: €").append(String.format("%.2f", totalRevenue)).append("\n");
+	            history.append("Average Sale: €").append(String.format("%.2f", totalRevenue / totalQuantity)).append("\n");
+	        } else {
+	            history.append("\nNo sales history found for this item.\n");
+	        }
+	        
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return history.toString();
+	}
 
 	
 	public void processReturn()
