@@ -1278,6 +1278,54 @@ public class Dashboard
                 JOptionPane.showMessageDialog(inventoryWindow, "Error viewing supplier items: " + ex.getMessage());
             }
         });
+        
+        JButton pdfButton = new JButton("Export PDF Report");
+        pdfButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        centerPanel.add(pdfButton);
+
+        pdfButton.addActionListener(e -> {
+            try {
+                List<Item> itemsForReport = loadItemsFromDatabase();
+                Report report = new Report();
+
+                String filePath = "Inventory_Report.pdf";
+                report.generatePDF(itemsForReport, filePath);
+
+                JOptionPane.showMessageDialog(inventoryWindow,
+                        "PDF Report generated successfully!\nSaved to: " + filePath);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(inventoryWindow,
+                        "Error generating PDF: " + ex.getMessage());
+            }
+        });
+        
+        JButton excelButton = new JButton("Export Excel Report");
+        excelButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        centerPanel.add(excelButton);
+
+        excelButton.addActionListener(e -> {
+            try {
+                List<Item> itemsForReport = loadItemsFromDatabase();
+                Report report = new Report();
+
+                String filePath = "Inventory_Report.xlsx";
+                report.generateExcel(itemsForReport, filePath);
+
+                JOptionPane.showMessageDialog(inventoryWindow,
+                        "Excel Report generated successfully!\nSaved to: " + filePath);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(inventoryWindow,
+                        "Error generating Excel file: " + ex.getMessage());
+            }
+        });
+
+        
+
+
+        
+
     }
     
     private void highlightLowStock(JTable table) {
