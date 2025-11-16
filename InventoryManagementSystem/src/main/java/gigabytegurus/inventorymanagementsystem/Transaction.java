@@ -9,11 +9,15 @@ import javax.swing.JOptionPane;
 
 public class Transaction
 {
-	private int transactionId;
-	private Item item;
-	private int quantity;
-	private String type;
-	private Date date;
+    private int transactionId;
+    private Item item;
+    private int quantity;
+    private String type;
+    private Date date;
+    private String reason;
+    
+    // Add test mode flag to prevent GUI popups during testing
+    public static boolean testMode = false;
 	
 	
 	public static boolean recordSale(int itemId, int quantitySold) {
@@ -79,7 +83,9 @@ public class Transaction
 	            checkStmt.setInt(1, itemId);
 	            ResultSet rs = checkStmt.executeQuery();
 	            if (!rs.next()) {
-	                JOptionPane.showMessageDialog(null, "Item not found with ID: " + itemId);
+	                if (!testMode) {
+				    JOptionPane.showMessageDialog(null, "Item not found with ID: " + itemId);
+				}
 	                return false;
 	            }
 	        }
@@ -111,7 +117,9 @@ public class Transaction
 	
 	    } catch (SQLException e) {
 	        e.printStackTrace();
-	        JOptionPane.showMessageDialog(null, "Database error processing return: " + e.getMessage());
+	        if (!testMode) {
+	        		JOptionPane.showMessageDialog(null, "Database error processing return: " + e.getMessage());
+	        }
 	        return false;
 	    }
 	}
@@ -133,14 +141,18 @@ public class Transaction
                 checkStmt.setInt(1, newItemId);
                 ResultSet rs = checkStmt.executeQuery();
                 if (!rs.next()) {
-                    JOptionPane.showMessageDialog(null, "New item not found with ID: " + newItemId);
+                    if (!testMode) {
+					    JOptionPane.showMessageDialog(null, "New item not found with ID: " + newItemId);
+					}
                     return false;
                 }
                 int currentStock = rs.getInt("quantity");
                 newItemName = rs.getString("itemName");
                 if (currentStock < newItemQuantity) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Not enough stock for exchange. " + newItemName + " available: " + currentStock + ", requested: " + newItemQuantity);
+                    if (!testMode) {
+					    JOptionPane.showMessageDialog(null, 
+					        "Not enough stock for exchange. " + newItemName + " available: " + currentStock + ", requested: " + newItemQuantity);
+					}
                     return false;
                 }
             }
@@ -151,7 +163,9 @@ public class Transaction
                 checkStmt.setInt(1, returnedItemId);
                 ResultSet rs = checkStmt.executeQuery();
                 if (!rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Returned item not found with ID: " + returnedItemId);
+                    if (!testMode) {
+					    JOptionPane.showMessageDialog(null, "Returned item not found with ID: " + returnedItemId);
+					}
                     return false;
                 }
                 returnedItemName = rs.getString("itemName");
@@ -189,7 +203,9 @@ public class Transaction
 
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Database error processing exchange: " + e.getMessage());
+            if (!testMode) {
+			    JOptionPane.showMessageDialog(null, "Database error processing exchange: " + e.getMessage());
+			}
             return false;
         }
     }
