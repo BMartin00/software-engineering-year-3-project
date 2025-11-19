@@ -216,6 +216,24 @@ public class Dashboard
 	    JPanel centerPanel = new JPanel();
 	    centerPanel.add(scrollPane);
 	    centerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 40, 40));
+
+	    // Export buttons
+	    JButton pdfButton = new JButton("Export PDF Report");
+	    pdfButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    centerPanel.add(pdfButton);
+
+	    JButton excelButton = new JButton("Export Excel Report");
+	    excelButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    centerPanel.add(excelButton);
+
+	    // Supplier buttons - UNDER export buttons
+	    JButton supplierButton = new JButton("Manage Suppliers");
+	    supplierButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    centerPanel.add(supplierButton);
+
+	    JButton linkSupplierButton = new JButton("Link Item to Supplier");
+	    linkSupplierButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    centerPanel.add(linkSupplierButton);
 	
 	    JPanel topPanel = new JPanel(new BorderLayout());
 	    topPanel.add(title, BorderLayout.CENTER);
@@ -227,7 +245,7 @@ public class Dashboard
 	    inventoryWindow.add(centerPanel, BorderLayout.CENTER);
 	    inventoryWindow.add(bottomPanel, BorderLayout.SOUTH);
 	    
-	    // ADD
+	    // ADD ITEM BUTTON
 	    JButton addItemButton = new JButton("Add New Item");
 	    addItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 	    
@@ -523,7 +541,7 @@ public class Dashboard
 	    // Add the delete button to the bottom panel
 	    bottomPanel.add(deleteButton);
 	    
-	 // RECORD SALE BUTTON
+	    // RECORD SALE BUTTON
 	    JButton recordSaleButton = new JButton("Record Sale");
 	    recordSaleButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 	    bottomPanel.add(recordSaleButton);
@@ -1279,10 +1297,7 @@ public class Dashboard
             }
         });
         
-        JButton pdfButton = new JButton("Export PDF Report");
-        pdfButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
-        centerPanel.add(pdfButton);
-
+        // PDF Export Button Action
         pdfButton.addActionListener(e -> {
             try {
                 List<Item> itemsForReport = loadItemsFromDatabase();
@@ -1300,10 +1315,7 @@ public class Dashboard
             }
         });
         
-        JButton excelButton = new JButton("Export Excel Report");
-        excelButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
-        centerPanel.add(excelButton);
-
+        // Excel Export Button Action
         excelButton.addActionListener(e -> {
             try {
                 List<Item> itemsForReport = loadItemsFromDatabase();
@@ -1320,12 +1332,166 @@ public class Dashboard
                         "Error generating Excel file: " + ex.getMessage());
             }
         });
-
         
+        // SUPPLIER BUTTON ACTION - Manage Suppliers
+        supplierButton.addActionListener(e -> {
+            JFrame supplierFrame = new JFrame("Supplier Management");
+            supplierFrame.setSize(600, 400);
+            supplierFrame.setLocationRelativeTo(inventoryWindow);
 
+            JPanel supplierPanel = new JPanel(new BorderLayout());
+            Inventory inventory = new Inventory();
+            List<Supplier> suppliers = inventory.getAllSuppliers();
 
-        
+            String[] supplierColumns = {"ID", "Name", "Contact"};
+            DefaultTableModel supplierModel = new DefaultTableModel(supplierColumns, 0);
+            
+            for (Supplier supplier : suppliers) {
+                supplierModel.addRow(new Object[]{
+                    supplier.getSupplierId(),
+                    supplier.getName(),
+                    supplier.getContact()
+                });
+            }
 
+            JTable supplierTable = new JTable(supplierModel);
+            supplierTable.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            supplierTable.setRowHeight(25);
+            
+            JScrollPane supplierScrollPane = new JScrollPane(supplierTable);
+
+            JPanel addSupplierPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+            JTextField supplierNameField = new JTextField(20);
+            JTextField supplierContactField = new JTextField(20);
+            
+            addSupplierPanel.add(new JLabel("Supplier Name:"));
+            addSupplierPanel.add(supplierNameField);
+            addSupplierPanel.add(new JLabel("Contact Info:"));
+            addSupplierPanel.add(supplierContactField);
+            
+            JButton addSupplierBtn = new JButton("Add New Supplier");
+            addSupplierPanel.add(addSupplierBtn);
+
+            addSupplierBtn.addActionListener(ev -> {
+                String name = supplierNameField.getText().trim();
+                String contact = supplierContactField.getText().trim();
+                
+                if (name.isEmpty() || contact.isEmpty()) {
+                    JOptionPane.showMessageDialog(supplierFrame, "Please fill in all supplier fields.");
+                    return;
+                }
+                
+                try {
+                    Supplier newSupplier = new Supplier(0, name, contact);
+                    inventory.addSupplier(newSupplier);
+                    
+                    List<Supplier> updatedSuppliers = inventory.getAllSuppliers();
+                    DefaultTableModel model = new DefaultTableModel(supplierColumns, 0);
+                    
+                    for (Supplier supplier : updatedSuppliers) {
+                        model.addRow(new Object[]{
+                            supplier.getSupplierId(),
+                            supplier.getName(),
+                            supplier.getContact()
+                        });
+                    }
+                    
+                    supplierTable.setModel(model);
+                    supplierNameField.setText("");
+                    supplierContactField.setText("");
+                    
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(supplierFrame, 
+                        "Error: " + ex.getMessage(), 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            supplierPanel.add(supplierScrollPane, BorderLayout.CENTER);
+            supplierPanel.add(addSupplierPanel, BorderLayout.SOUTH);
+            
+            supplierFrame.add(supplierPanel);
+            supplierFrame.setVisible(true);
+        });
+
+        // LINK SUPPLIER BUTTON ACTION
+        linkSupplierButton.addActionListener(e -> {
+            try {
+                String itemIdInput = JOptionPane.showInputDialog(
+                    inventoryWindow, 
+                    "Enter the ID of the item you want to link to a supplier:",
+                    "Link Item to Supplier",
+                    JOptionPane.QUESTION_MESSAGE
+                );
+                
+                if (itemIdInput == null || itemIdInput.trim().isEmpty()) {
+                    return;
+                }
+                
+                int itemId = Integer.parseInt(itemIdInput.trim());
+                Inventory inventory = new Inventory();
+                List<Supplier> suppliers = inventory.getAllSuppliers();
+                
+                if (suppliers.isEmpty()) {
+                    JOptionPane.showMessageDialog(inventoryWindow, "No suppliers available. Please add suppliers first.");
+                    return;
+                }
+                
+                String[] supplierNames = new String[suppliers.size()];
+                for (int i = 0; i < suppliers.size(); i++) {
+                    supplierNames[i] = suppliers.get(i).getSupplierId() + " - " + suppliers.get(i).getName();
+                }
+                
+                String selectedSupplier = (String) JOptionPane.showInputDialog(
+                    inventoryWindow,
+                    "Select a supplier for item ID " + itemId + ":",
+                    "Select Supplier",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    supplierNames,
+                    supplierNames[0]
+                );
+                
+                if (selectedSupplier != null) {
+                    int supplierId = Integer.parseInt(selectedSupplier.split(" - ")[0]);
+                    inventory.updateItemSupplier(itemId, supplierId);
+                    
+                    JOptionPane.showMessageDialog(inventoryWindow, 
+                        "Item successfully linked to supplier!");
+                    
+                    List<Item> updatedItems = loadItemsFromDatabase();
+                    DefaultTableModel model = new DefaultTableModel(
+                        new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                    );
+
+                    for (Item item : updatedItems) {
+                        model.addRow(new Object[]{
+                            item.getItemId(),
+                            item.getName(),
+                            item.getCategory(),
+                            item.getSize(),
+                            item.getColour(),
+                            item.getQuantity(),
+                            item.getPrice(),
+                            item.getSupplier() != null ? item.getSupplier().getName() : ""
+                        });
+                    }
+
+                    table.setModel(model);
+                }
+                
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(inventoryWindow, "Invalid ID format. Please enter a valid number.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(inventoryWindow, "Error linking item to supplier: " + ex.getMessage());
+            }
+        });
+	    
+	    // Highlight low stock when the window opens
+	    highlightLowStock(table);
+	  
     }
     
     private void highlightLowStock(JTable table) {

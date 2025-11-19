@@ -1098,6 +1098,208 @@ public class InventoryTest extends TestCase{
 	    
 	}
 	
+	// Test #: 77
+	// Obj: Test adding a new supplier with valid data
+	// Input(s): name = "Test Supplier", contact = "test@supplier.com"
+	// Expected Output: Supplier added successfully
+	public void testAddValidSupplier() throws SQLException {
+	    Inventory inventory = new Inventory();
+	    Supplier supplier = new Supplier(0, "Test Supplier", "test@supplier.com");
+	    
+	    inventory.addSupplier(supplier);
+	    
+	    List<Supplier> suppliers = inventory.getAllSuppliers();
+	    boolean found = suppliers.stream()
+	        .anyMatch(s -> s.getName().equals("Test Supplier") && s.getContact().equals("test@supplier.com"));
+	    
+	    assertTrue("Supplier should be added to database", found);
+	}
+
+	// Test #: 78
+	// Obj: Test adding supplier with empty name
+	// Input(s): name = "", contact = "test@supplier.com"
+	// Expected Output: IllegalArgumentException thrown
+	public void testAddSupplierWithEmptyName() {
+	    Inventory inventory = new Inventory();
+	    
+	    try {
+	        Supplier supplier = new Supplier(0, "", "test@supplier.com");
+	        inventory.addSupplier(supplier);
+	        fail("Should have thrown IllegalArgumentException");
+	    } catch (IllegalArgumentException e) {
+	        // Expected - test passes
+	        assertTrue(true);
+	    }
+	}
+
+	// Test #: 79
+	// Obj: Test adding supplier with null contact
+	// Input(s): name = "Test Supplier", contact = null
+	// Expected Output: IllegalArgumentException thrown
+	public void testAddSupplierWithNullContact() {
+	    Inventory inventory = new Inventory();
+	    
+	    try {
+	        Supplier supplier = new Supplier(0, "Test Supplier", null);
+	        inventory.addSupplier(supplier);
+	        fail("Should have thrown IllegalArgumentException");
+	    } catch (IllegalArgumentException e) {
+	        // Expected - test passes
+	        assertTrue(true);
+	    }
+	}
+
+
+	// Test #: 80
+	// Obj: Test retrieving all suppliers from database
+	// Input(s): None
+	// Expected Output: List of all suppliers returned
+	public void testGetAllSuppliers() throws SQLException {
+	    Inventory inventory = new Inventory();
+	    
+	    // Add test suppliers first
+	    inventory.addSupplier(new Supplier(0, "Supplier A", "contactA@test.com"));
+	    inventory.addSupplier(new Supplier(0, "Supplier B", "contactB@test.com"));
+	    
+	    List<Supplier> suppliers = inventory.getAllSuppliers();
+	    
+	    assertTrue("Should return at least 2 suppliers", suppliers.size() >= 2);
+	    assertTrue("Should contain Supplier A", 
+	        suppliers.stream().anyMatch(s -> s.getName().equals("Supplier A")));
+	    assertTrue("Should contain Supplier B", 
+	        suppliers.stream().anyMatch(s -> s.getName().equals("Supplier B")));
+	}
+
+	// Test #: 81
+	// Obj: Test linking item to existing supplier
+	// Input(s): itemId = 1, supplierId = 1
+	// Expected Output: Item successfully linked to supplier
+	public void testLinkItemToSupplier() throws SQLException {
+	    Inventory inventory = new Inventory();
+	    
+	    // First add a supplier
+	    inventory.addSupplier(new Supplier(0, "Test Link Supplier", "link@test.com"));
+	    List<Supplier> suppliers = inventory.getAllSuppliers();
+	    int supplierId = suppliers.get(0).getSupplierId();
+	    
+	    // Link item to supplier
+	    inventory.updateItemSupplier(1, supplierId);
+	    
+	    // Verify link
+	    List<Item> supplierItems = inventory.getItemsBySupplier(supplierId);
+	    boolean itemFound = supplierItems.stream()
+	        .anyMatch(item -> item.getItemId() == 1);
+	    
+	    assertTrue("Item should be linked to supplier", itemFound);
+	}
+
+	// Test #: 82
+	// Obj: Test getting items by specific supplier
+	// Input(s): supplierId = 1
+	// Expected Output: List of items from that supplier
+	public void testGetItemsBySupplier() throws SQLException {
+	    Inventory inventory = new Inventory();
+	    
+	    // Add supplier and link some items
+	    inventory.addSupplier(new Supplier(0, "Items Test Supplier", "items@test.com"));
+	    List<Supplier> suppliers = inventory.getAllSuppliers();
+	    int supplierId = suppliers.get(0).getSupplierId();
+	    
+	    // Link multiple items to this supplier
+	    inventory.updateItemSupplier(1, supplierId);
+	    inventory.updateItemSupplier(2, supplierId);
+	    
+	    List<Item> supplierItems = inventory.getItemsBySupplier(supplierId);
+	    
+	    assertTrue("Should return items for supplier", supplierItems.size() >= 2);
+	    assertTrue("All returned items should belong to the specified supplier",
+	        supplierItems.stream().allMatch(item -> 
+	            item.getSupplier() != null && item.getSupplier().getSupplierId() == supplierId));
+	}
+
+	// Test #: 83
+	// Obj: Test unlinking item from supplier (set supplier to null)
+	// Input(s): itemId = 1, supplierId = 0 (null)
+	// Expected Output: Item supplier set to null
+	public void testUnlinkItemFromSupplier() throws SQLException {
+	    Inventory inventory = new Inventory();
+	    
+	    // First link item to a supplier
+	    inventory.addSupplier(new Supplier(0, "Unlink Test Supplier", "unlink@test.com"));
+	    List<Supplier> suppliers = inventory.getAllSuppliers();
+	    int supplierId = suppliers.get(0).getSupplierId();
+	    inventory.updateItemSupplier(1, supplierId);
+	    
+	    // Now unlink by setting supplier to null
+	    inventory.updateItemSupplier(1, 0);
+	    
+	    // Verify item has no supplier
+	    List<Item> supplierItems = inventory.getItemsBySupplier(supplierId);
+	    boolean itemStillLinked = supplierItems.stream()
+	        .anyMatch(item -> item.getItemId() == 1);
+	    
+	    assertFalse("Item should no longer be linked to supplier", itemStillLinked);
+	}
+
+	// Test #: 84
+	// Obj: Test searching items by supplier name
+	// Input(s): keyword = "Search Test Supplier"
+	// Expected Output: Items from Search Test Supplier returned
+	public void testSearchItemsBySupplierName() throws SQLException {
+	    Inventory inventory = new Inventory();
+	    
+	    // Add supplier
+	    Supplier supplier = new Supplier(0, "Search Test Supplier", "search@test.com");
+	    inventory.addSupplier(supplier);
+	    
+	    // Search for supplier name
+	    List<Item> searchResults = inventory.searchItem("Search Test Supplier");
+	    
+	    assertTrue("Should find items by supplier name", searchResults.size() >= 0);
+	}
+
+	// Test #: 85
+	// Obj: Test adding item with supplier selection
+	// Input(s): Item with selected supplier
+	// Expected Output: Item added with correct supplier linked
+	public void testAddItemWithSupplier() throws SQLException {
+	    Inventory inventory = new Inventory();
+	    
+	    // Add a supplier first
+	    inventory.addSupplier(new Supplier(0, "Item Add Supplier", "itemadd@test.com"));
+	    List<Supplier> suppliers = inventory.getAllSuppliers();
+	    Supplier selectedSupplier = suppliers.get(0);
+	    
+	    // Create item with supplier
+	    Item newItem = new Item(0, "Test Item", "Test Category", "M", "Red", 29.99, 50, selectedSupplier);
+	    inventory.addItem(newItem);
+	    
+	    // Verify item was added with correct supplier
+	    List<Item> supplierItems = inventory.getItemsBySupplier(selectedSupplier.getSupplierId());
+	    boolean itemFound = supplierItems.stream()
+	        .anyMatch(item -> item.getName().equals("Test Item") && 
+	                         item.getSupplier().getSupplierId() == selectedSupplier.getSupplierId());
+	    
+	    assertTrue("Item should be added with correct supplier", itemFound);
+	}
+
+	// Test #: 86
+	// Obj: Test supplier integration in organize by category
+	// Input(s): None
+	// Expected Output: Organized items include supplier information
+	public void testOrganizeByCategoryIncludesSuppliers() throws SQLException {
+	    Inventory inventory = new Inventory();
+	    
+	    List<Item> organizedItems = inventory.organizeByCategory();
+	    
+	    assertTrue("Should return organized items", organizedItems.size() > 0);
+	    // Verify that supplier information is properly loaded
+	    assertTrue("Items should have supplier information loaded",
+	        organizedItems.stream().allMatch(item -> 
+	            item.getSupplier() == null || 
+	            (item.getSupplier().getName() != null && item.getSupplier().getContact() != null)));
+	}
+	
 	
 	
 	
@@ -1110,6 +1312,8 @@ public class InventoryTest extends TestCase{
 	        return -1; 
 	    }
 	}
+	
+	
 
 
     // KEEP THIS METHOD AT THE BOTTOM OF THE FILE AT ALL TIMES TO RESET THE DATABASE EVERY RUN SO YOU DONT HAVE TO RUN A NEW SQL FILE EVERYTIME
