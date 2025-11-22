@@ -33,7 +33,7 @@ public class Inventory
 	        // Create suppliers table if it doesn't exist
 	        String createSuppliersTable = """
 	            CREATE TABLE IF NOT EXISTS suppliers (
-	                supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	                supplier_id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	                name TEXT NOT NULL,
 	                contact TEXT NOT NULL
 	            )
