@@ -10,35 +10,40 @@
       <artifactId>mysql-connector-j</artifactId>
       <version>9.1.0</version>
     </dependency>
+    
     <!-- JUnit 3 -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.2</version>
-    <scope>test</scope>
-</dependency>
+      <scope>test</scope>
+	</dependency>
 
+	<!-- Apache POI for Excel -->
+	<dependency>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi</artifactId>
+	    <version>5.2.5</version>
+	</dependency>
 
-<!-- Apache POI for Excel -->
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi</artifactId>
-    <version>5.2.5</version>
-</dependency>
+	<dependency>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi-ooxml</artifactId>
+	    <version>5.2.5</version>
+	</dependency>
 
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi-ooxml</artifactId>
-    <version>5.2.5</version>
-</dependency>
-
-
-<!-- OpenPDF for PDF generation -->
-<dependency>
-    <groupId>com.github.librepdf</groupId>
-    <artifactId>openpdf</artifactId>
-    <version>1.3.30</version>
-</dependency>
-
+	<!-- OpenPDF for PDF generation -->
+	<dependency>
+	    <groupId>com.github.librepdf</groupId>
+	    <artifactId>openpdf</artifactId>
+	    <version>1.3.30</version>
+	</dependency>
   </dependencies>
+  
+  <properties>
+  	<sonar.organization>bmartin00</sonar.organization>
+    <sonar.projectKey>BMartin00_software-engineering-year-3-project</sonar.projectKey>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+  </properties>
+  
 </project>
