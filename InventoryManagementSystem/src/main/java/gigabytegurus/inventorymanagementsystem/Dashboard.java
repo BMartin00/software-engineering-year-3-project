@@ -10,6 +10,9 @@ import javax.swing.table.DefaultTableModel;
 public class Dashboard
 {
     public User currentUser;
+    
+    // Add test mode flag to prevent GUI popups during testing
+    public static boolean testMode = false;
 
     JFrame window = new JFrame("Clothing Inventory Management System");
     JPanel panel = new JPanel(new GridBagLayout());
@@ -61,10 +64,12 @@ public class Dashboard
         registerButton.addActionListener(e -> handleRegister());
 
         // Setup window
-        window.add(panel);
-        window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setVisible(true);
+        if (!testMode) {
+	        window.add(panel);
+	        window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+	        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	        window.setVisible(true);
+        }
     }
     
     public void handleLogin()
@@ -74,7 +79,9 @@ public class Dashboard
 
         if (username.isEmpty() || password.isEmpty())
         {
-            JOptionPane.showMessageDialog(window, "Please enter username and password");
+        		if (!testMode) {
+        			JOptionPane.showMessageDialog(window, "Please enter username and password");
+        		}
             return;
         }
 
@@ -88,25 +95,31 @@ public class Dashboard
             ResultSet rs = stmt.executeQuery();
             if (rs.next())
             {
-                JOptionPane.showMessageDialog(window, "✅ Login Successful!");
                 currentUser = new User(
                         rs.getInt("user_id"),
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("role")
                 );
-                openInventoryWindow();
+                if (!testMode) {
+            			JOptionPane.showMessageDialog(window, "✅ Login Successful!");
+            			openInventoryWindow();
+            		}
             }
             else
             {
-                JOptionPane.showMessageDialog(window, "❌ Invalid username or password");
+	            	if (!testMode) {
+	                JOptionPane.showMessageDialog(window, "❌ Invalid username or password");
+	            	}
             }
 
         }
         catch (SQLException ex)
         {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(window, "Database error: " + ex.getMessage());
+            if (!testMode) {
+            		JOptionPane.showMessageDialog(window, "Database error: " + ex.getMessage());
+            }
         }
     }
     
@@ -117,7 +130,9 @@ public class Dashboard
 
         if (username.isEmpty() || password.isEmpty())
         {
-            JOptionPane.showMessageDialog(window, "Please fill in both username and password.");
+	        	if (!testMode) {
+	            JOptionPane.showMessageDialog(window, "Please fill in both username and password.");
+	        	}
             return;
         }
 
@@ -131,7 +146,9 @@ public class Dashboard
 
             if (rs.next())
             {
-                JOptionPane.showMessageDialog(window, "⚠️ Username already exists. Choose another one.");
+	            	if (!testMode) {
+	                JOptionPane.showMessageDialog(window, "⚠️ Username already exists. Choose another one.");
+	            	}
                 return;
             }
 
@@ -145,20 +162,26 @@ public class Dashboard
             int rows = insertStmt.executeUpdate();
             if (rows > 0)
             {
-                JOptionPane.showMessageDialog(window, "✅ Registration successful! You can now log in.");
-                usernameInput.setText("");
-                passwordInput.setText("");
+	            	if (!testMode) {
+	                JOptionPane.showMessageDialog(window, "✅ Registration successful! You can now log in.");
+	                usernameInput.setText("");
+	                passwordInput.setText("");
+	            	}
             }
             else
             {
-                JOptionPane.showMessageDialog(window, "⚠️ Registration failed. Try again.");
+	            	if (!testMode) {
+	                JOptionPane.showMessageDialog(window, "⚠️ Registration failed. Try again.");
+	            	}
             }
 
         }
         catch (SQLException ex)
         {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(window, "Database error: " + ex.getMessage());
+	        if (!testMode) {
+	        		JOptionPane.showMessageDialog(window, "Database error: " + ex.getMessage());
+	        }
         }
     }
     

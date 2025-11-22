@@ -8,11 +8,17 @@ public class DashboardTest extends TestCase
     private Dashboard dashboard;
 
     @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        dashboard = new Dashboard();
-    }
+	protected void setUp() throws Exception {
+	    super.setUp();
+	    Dashboard.testMode = true;       // Enable test mode
+	    dashboard = new Dashboard();      // GUI will not show
+	}
+	
+	@Override
+	protected void tearDown() throws Exception {
+	    super.tearDown();
+	    Dashboard.testMode = false;      // Reset after test
+	}
 
     /* LOGIN TESTS */
 
