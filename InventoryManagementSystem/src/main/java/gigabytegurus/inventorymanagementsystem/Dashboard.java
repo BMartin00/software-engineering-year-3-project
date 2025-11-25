@@ -85,10 +85,10 @@ public class Dashboard
             return;
         }
 
-        try (Connection conn = DatabaseConnection.getConnection())
+        String query = "SELECT * FROM users WHERE username=? AND password=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+        		PreparedStatement stmt = conn.prepareStatement(query))
         {
-            String query = "SELECT * FROM users WHERE username=? AND password=?";
-            PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, username);
             stmt.setString(2, password);
 
@@ -136,11 +136,14 @@ public class Dashboard
             return;
         }
 
-        try (Connection conn = DatabaseConnection.getConnection())
+        String checkQuery = "SELECT * FROM users WHERE username=?";
+        String insertQuery = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+        		PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+        		PreparedStatement insertStmt = conn.prepareStatement(insertQuery))
         {
             // Check if username already exists
-            String checkQuery = "SELECT * FROM users WHERE username=?";
-            PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
             checkStmt.setString(1, username);
             ResultSet rs = checkStmt.executeQuery();
 
@@ -153,8 +156,6 @@ public class Dashboard
             }
 
             // Insert new user
-            String insertQuery = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
-            PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
             insertStmt.setString(1, username);
             insertStmt.setString(2, password);
             insertStmt.setString(3, "user");
@@ -1550,11 +1551,13 @@ public class Dashboard
     public List<Item> loadItemsFromDatabase()
     {
         List<Item> items = new ArrayList<>();
-        try (Connection conn = DatabaseConnection.getConnection())
-        {
-            String query = "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
+        
+        String query = "SELECT i.*, s.name AS supplierName, s.contact AS supplierContact " +
                     "FROM items i LEFT JOIN suppliers s ON i.supplier_id = s.supplier_id";
-            PreparedStatement stmt = conn.prepareStatement(query);
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+        		PreparedStatement stmt = conn.prepareStatement(query))
+        {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next())

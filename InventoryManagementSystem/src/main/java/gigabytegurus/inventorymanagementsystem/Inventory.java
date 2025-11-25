@@ -63,9 +63,10 @@ public class Inventory
 	        throw new IllegalArgumentException("Supplier contact cannot be empty.");
 	    }
 
-	    try (Connection conn = DatabaseConnection.getConnection()) {
-	        String sql = "INSERT INTO suppliers (name, contact) VALUES (?, ?)";
-	        PreparedStatement stmt = conn.prepareStatement(sql);
+	    String sql = "INSERT INTO suppliers (name, contact) VALUES (?, ?)";
+	    
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        
 	        stmt.setString(1, supplier.getName());
 	        stmt.setString(2, supplier.getContact());
@@ -113,9 +114,10 @@ public class Inventory
 	}
 
 	public void updateItemSupplier(int itemId, int supplierId) {
-	    try (Connection conn = DatabaseConnection.getConnection()) {
-	        String sql = "UPDATE items SET supplier_id = ? WHERE itemId = ?";
-	        PreparedStatement stmt = conn.prepareStatement(sql);
+		String sql = "UPDATE items SET supplier_id = ? WHERE itemId = ?";
+		
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        
 	        if (supplierId > 0) {
 	            stmt.setInt(1, supplierId);
@@ -422,13 +424,12 @@ public class Inventory
 	        items.add(item);
 	    }
 	    
-
-	    try (Connection conn = DatabaseConnection.getConnection())
-	    {
-	        String sql = "INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_id) " +
+	    String sql = "INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_id) " +
 	                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
-	        
-	        PreparedStatement stmt = conn.prepareStatement(sql);
+
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement stmt = conn.prepareStatement(sql))
+	    {	        
 	        
 	        stmt.setString(1, item.getName());
 	        stmt.setString(2, item.getCategory());
@@ -460,10 +461,13 @@ public class Inventory
 	
 	public void updateItem(int itemId)
 	{
-	    try (Connection conn = DatabaseConnection.getConnection())
+		String selectSQL = "SELECT * FROM items WHERE itemId = ?";
+		String updateSQL = "UPDATE items SET itemName=?, category=?, size=?, colour=?, price=?, quantity=? WHERE itemId=?";
+		
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement updateStmt = conn.prepareStatement(updateSQL);
+	    		PreparedStatement selectStmt = conn.prepareStatement(selectSQL))
 	    {
-	        String selectSQL = "SELECT * FROM items WHERE itemId = ?";
-	        PreparedStatement selectStmt = conn.prepareStatement(selectSQL);
 	        selectStmt.setInt(1, itemId);
 	        ResultSet rs = selectStmt.executeQuery();
 
@@ -544,8 +548,6 @@ public class Inventory
 	        if (price < 0) throw new IllegalArgumentException("Price cannot be negative.");
 	        if (quantity < 0) throw new IllegalArgumentException("Quantity cannot be negative.");
 
-	        String updateSQL = "UPDATE items SET itemName=?, category=?, size=?, colour=?, price=?, quantity=? WHERE itemId=?";
-	        PreparedStatement updateStmt = conn.prepareStatement(updateSQL);
 	        updateStmt.setString(1, name);
 	        updateStmt.setString(2, category);
 	        updateStmt.setString(3, size);
@@ -680,9 +682,10 @@ public class Inventory
 	}
 	
 	public boolean removeItem(int itemId) {
-	    try (Connection conn = DatabaseConnection.getConnection()) {
-	        String deleteSQL = "DELETE FROM items WHERE itemId = ?";
-	        PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL);
+		String deleteSQL = "DELETE FROM items WHERE itemId = ?";
+		
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL)) {
 	        deleteStmt.setInt(1, itemId);
 
 	        int rowsAffected = deleteStmt.executeUpdate();

@@ -25,14 +25,13 @@ public class Report
  // PDF METHOD 
     public void generatePDF(List<Item> items, String filePath)
     {
-        try
+        try (Document document = new Document())
         {
             // Determine the user's Downloads folder and build full save path
             String downloads = System.getProperty("user.home") + "/Downloads/";
             String savePath = downloads + filePath;
 
             // Create a new PDF document and prepare to write to the output file
-            Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream(savePath));
 
             document.open();

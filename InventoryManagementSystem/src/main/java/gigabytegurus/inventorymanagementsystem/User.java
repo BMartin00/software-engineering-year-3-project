@@ -61,10 +61,11 @@ public class User
 
     public boolean login(String username, String password)
     {
-        try (Connection conn = DatabaseConnection.getConnection())
+    		String query = "SELECT * FROM users WHERE username=? AND password=?";
+    	
+        try (Connection conn = DatabaseConnection.getConnection();
+        		PreparedStatement stmt = conn.prepareStatement(query))
         {
-            String query = "SELECT * FROM users WHERE username=? AND password=?";
-            PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, username);
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
@@ -84,13 +85,15 @@ public class User
 
     public boolean register(String username, String password, String role)
     {
-        try (Connection conn = DatabaseConnection.getConnection())
+    		String query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)"; 
+    	
+        try (Connection conn = DatabaseConnection.getConnection();
+        		PreparedStatement stmt = conn.prepareStatement(query))
         {
-            String query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, username);
             stmt.setString(2, password);
             stmt.setString(3, role);
+            
             stmt.executeUpdate();
             return true;
         }
