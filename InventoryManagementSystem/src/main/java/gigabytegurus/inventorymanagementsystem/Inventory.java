@@ -72,7 +72,6 @@ public class Inventory
 	        stmt.setString(2, supplier.getContact());
 
 	        stmt.executeUpdate();
-	        stmt.close();
 	        
 	        logger.info("Supplier '" + supplier.getName() + "' added successfully!");
 	        
@@ -127,7 +126,6 @@ public class Inventory
 	        
 	        stmt.setInt(2, itemId);
 	        stmt.executeUpdate();
-	        stmt.close();
 	        
 	        logger.info("Item supplier updated successfully.");
 	    } catch (SQLException e) {
@@ -448,7 +446,6 @@ public class Inventory
 	        }
 
 	        stmt.executeUpdate();
-	        stmt.close();
 
 	        System.out.println("Item added successfully to database.");
 	    }
@@ -473,7 +470,6 @@ public class Inventory
 
 	        if (!rs.next()) {
 	            if (!testMode) JOptionPane.showMessageDialog(null, "⚠No item found with ID: " + itemId);
-	            selectStmt.close();
 	            return;
 	        }
 
@@ -512,7 +508,6 @@ public class Inventory
 	            if (result != JOptionPane.OK_OPTION) {
 	                if (!testMode) JOptionPane.showMessageDialog(null, "Edit cancelled. No changes were made.");
 	                rs.close();
-	                selectStmt.close();
 	                return;
 	            }
 
@@ -527,7 +522,6 @@ public class Inventory
 	            } catch (NumberFormatException ex) {
 	                if (!testMode) JOptionPane.showMessageDialog(null, "Invalid number format for price or quantity.");
 	                rs.close();
-	                selectStmt.close();
 	                return;
 	            }
 
@@ -557,7 +551,6 @@ public class Inventory
 	        updateStmt.setInt(7, itemId);
 
 	        int rows = updateStmt.executeUpdate();
-	        updateStmt.close();
 
 	        if (!testMode) {
 	            if (rows > 0) {
@@ -568,7 +561,6 @@ public class Inventory
 	        }
 
 	        rs.close();
-	        selectStmt.close();
 	    }
 	    catch (SQLException e)
 	    {
@@ -689,7 +681,6 @@ public class Inventory
 	        deleteStmt.setInt(1, itemId);
 
 	        int rowsAffected = deleteStmt.executeUpdate();
-	        deleteStmt.close();
 
 	        if (rowsAffected > 0) {
 	            if (items != null) {

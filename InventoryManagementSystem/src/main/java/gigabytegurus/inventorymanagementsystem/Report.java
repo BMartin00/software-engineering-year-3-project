@@ -59,9 +59,6 @@ public class Report
                 // Add entry to the document
                 document.add(p);
             }
-
-            // Close the file when finished writing
-            document.close();
         }
         catch (Exception e)
         {
