@@ -11,6 +11,29 @@ public class Dashboard
 {
     public User currentUser;
     
+    public static final String CATEGORY = "Category";
+    public static final String COLOUR = "Colour";
+    public static final String PRICE_EURO = "Price (€)";
+    public static final String QUANTITY = "Quantity";
+    public static final String SUPPLIER = "Supplier";
+    public static final String SANSSERIF_FONT = "SansSerif";
+    
+    public static final String PROCESS_RETURN = "Process Return";
+    public static final String RECORD_SALE = "Record Sale";
+    
+    public static final String INVALID_ITEM_ID = "Invalid item ID.";
+    public static final String INVALID_NUMBER = "Invalid number entered. Please try again.";
+    
+    public static final String FIELD_CATEGORY = "category";
+    public static final String FIELD_COLOUR = "colour";
+    public static final String FIELD_ITEM_ID = "itemId";
+    public static final String FIELD_ITEM_NAME = "itemName";
+    public static final String FIELD_PRICE = "price";
+    public static final String FIELD_QUANTITY = "quantity";
+    public static final String FIELD_SUPPLIER_CONTACT = "supplierContact";
+    public static final String FIELD_SUPPLIER_NAME = "supplierName";
+    public static final String FIELD_SUPPLIER_ID = "supplier_id";
+    
     // Add test mode flag to prevent GUI popups during testing
     public static boolean testMode = false;
 
@@ -194,7 +217,7 @@ public class Dashboard
 	
 	    List<Item> items = loadItemsFromDatabase();
 	
-	    String[] columns = {"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"};
+	    String[] columns = {"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER};
 	    Object[][] data = new Object[items.size()][columns.length];
 	
 	    for (int i = 0; i < items.size(); i++)
@@ -219,18 +242,18 @@ public class Dashboard
 	        }
 	    };
 	
-	    table.setFont(new Font("SansSerif", Font.PLAIN, 16));
+	    table.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 16));
 	    table.setRowHeight(30);
-	    table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 18));
+	    table.getTableHeader().setFont(new Font(SANSSERIF_FONT, Font.BOLD, 18));
 	
 	    JScrollPane scrollPane = new JScrollPane(table);
 	    scrollPane.setPreferredSize(new Dimension(900, 700));
 	
 	    JLabel title = new JLabel("Inventory List", SwingConstants.CENTER);
-	    title.setFont(new Font("SansSerif", Font.BOLD, 28));
+	    title.setFont(new Font(SANSSERIF_FONT, Font.BOLD, 28));
 	
 	    JButton backButton = new JButton("Back to Login");
-	    backButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    backButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    backButton.addActionListener(e ->
 	    {
 	        inventoryWindow.dispose();
@@ -243,20 +266,20 @@ public class Dashboard
 
 	    // Export buttons
 	    JButton pdfButton = new JButton("Export PDF Report");
-	    pdfButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    pdfButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    centerPanel.add(pdfButton);
 
 	    JButton excelButton = new JButton("Export Excel Report");
-	    excelButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    excelButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    centerPanel.add(excelButton);
 
 	    // Supplier buttons - UNDER export buttons
 	    JButton supplierButton = new JButton("Manage Suppliers");
-	    supplierButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    supplierButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    centerPanel.add(supplierButton);
 
 	    JButton linkSupplierButton = new JButton("Link Item to Supplier");
-	    linkSupplierButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    linkSupplierButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    centerPanel.add(linkSupplierButton);
 	
 	    JPanel topPanel = new JPanel(new BorderLayout());
@@ -271,7 +294,7 @@ public class Dashboard
 	    
 	    // ADD ITEM BUTTON
 	    JButton addItemButton = new JButton("Add New Item");
-	    addItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    addItemButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    
 	    addItemButton.addActionListener(e -> {
 	    	
@@ -344,7 +367,7 @@ public class Dashboard
 	                //  Refresh the table to immediately show the new item
 	                List<Item> updatedItems = loadItemsFromDatabase();
 	                DefaultTableModel model = new DefaultTableModel(
-	                        new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0);
+	                        new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0);
 
 	                
 	                // Rebuild the table data with the updated inventory
@@ -383,7 +406,7 @@ public class Dashboard
 	  
 	    // EDIT ITEM BUTTON — allows the user to update an existing record
 	    JButton editItemButton = new JButton("Edit Item");
-	    editItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    editItemButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 
 	    // When the button is clicked, the program asks which item the user wants to edit
 	    editItemButton.addActionListener(e -> {
@@ -413,7 +436,7 @@ public class Dashboard
 
 	            // Rebuild the table model using the new inventory data
 	            DefaultTableModel model = new DefaultTableModel(
-	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0);
+	                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0);
 
 	            // Add each item as a new row in the table
 	            for (Item item : updatedItems) {
@@ -449,7 +472,7 @@ public class Dashboard
 	    
 	    // SEARCH BUTTON 
 	    JButton searchItemButton = new JButton("Search Item");
-	    searchItemButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    searchItemButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    bottomPanel.add(searchItemButton);
 
 	    // Search Item Button Logic
@@ -473,7 +496,7 @@ public class Dashboard
 
 	            // Update table with search results
 	            DefaultTableModel model = new DefaultTableModel(
-	                new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+	                new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
 	            );
 
 	            for (Item item : searchResults) {
@@ -509,7 +532,7 @@ public class Dashboard
 	    
 	 // DELETE BUTTON
 	    JButton deleteButton = new JButton("Delete");
-	    deleteButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    deleteButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 
 	    deleteButton.addActionListener(e -> {
 	        try {
@@ -535,7 +558,7 @@ public class Dashboard
 	            // Refresh the table to show updated inventory
 	            List<Item> updatedItems = loadItemsFromDatabase();
 	            DefaultTableModel model = new DefaultTableModel(
-	                new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+	                new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
 	            );
 
 	            for (Item item : updatedItems) {
@@ -566,8 +589,8 @@ public class Dashboard
 	    bottomPanel.add(deleteButton);
 	    
 	    // RECORD SALE BUTTON
-	    JButton recordSaleButton = new JButton("Record Sale");
-	    recordSaleButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    JButton recordSaleButton = new JButton(RECORD_SALE);
+	    recordSaleButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    bottomPanel.add(recordSaleButton);
 
 	    recordSaleButton.addActionListener(e -> {
@@ -575,7 +598,7 @@ public class Dashboard
 	            String idInput = JOptionPane.showInputDialog(
 	                inventoryWindow,
 	                "Enter the ID of the item sold:",
-	                "Record Sale",
+	                RECORD_SALE,
 	                JOptionPane.QUESTION_MESSAGE
 	            );
 
@@ -589,7 +612,7 @@ public class Dashboard
 	            String qtyInput = JOptionPane.showInputDialog(
 	                inventoryWindow,
 	                "Enter quantity sold:",
-	                "Record Sale",
+	                RECORD_SALE,
 	                JOptionPane.QUESTION_MESSAGE
 	            );
 
@@ -607,7 +630,7 @@ public class Dashboard
 	                // Refresh the table
 	                List<Item> updatedItems = loadItemsFromDatabase();
 	                DefaultTableModel model = new DefaultTableModel(
-	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+	                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
 	                );
 
 	                for (Item item : updatedItems) {
@@ -630,7 +653,7 @@ public class Dashboard
 	            }
 
 	        } catch (NumberFormatException ex) {
-	            JOptionPane.showMessageDialog(inventoryWindow, "Invalid number entered. Please try again.");
+	            JOptionPane.showMessageDialog(inventoryWindow, INVALID_NUMBER);
 	        } catch (Exception ex) {
 	            ex.printStackTrace();
 	            JOptionPane.showMessageDialog(inventoryWindow, "Error recording sale: " + ex.getMessage());
@@ -639,8 +662,8 @@ public class Dashboard
 	    
 	    
 	    // PROCESS RETURN BUTTON
-		JButton processReturnButton = new JButton("Process Return");
-		processReturnButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+		JButton processReturnButton = new JButton(PROCESS_RETURN);
+		processReturnButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 		bottomPanel.add(processReturnButton);
 		
 		processReturnButton.addActionListener(e -> {
@@ -649,7 +672,7 @@ public class Dashboard
 		        String idInput = JOptionPane.showInputDialog(
 		            inventoryWindow,
 		            "Enter the ID of the item being returned:",
-		            "Process Return",
+		            PROCESS_RETURN,
 		            JOptionPane.QUESTION_MESSAGE
 		        );
 		
@@ -663,7 +686,7 @@ public class Dashboard
 		        String qtyInput = JOptionPane.showInputDialog(
 		            inventoryWindow,
 		            "Enter quantity being returned:",
-		            "Process Return",
+		            PROCESS_RETURN,
 		            JOptionPane.QUESTION_MESSAGE
 		        );
 		
@@ -692,7 +715,7 @@ public class Dashboard
 		            // Refresh the table
 		            List<Item> updatedItems = loadItemsFromDatabase();
 		            DefaultTableModel model = new DefaultTableModel(
-		                new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+		                new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
 		            );
 		
 		            for (Item item : updatedItems) {
@@ -718,7 +741,7 @@ public class Dashboard
 		        }
 		
 		    } catch (NumberFormatException ex) {
-		        JOptionPane.showMessageDialog(inventoryWindow, "Invalid number entered. Please try again.");
+		        JOptionPane.showMessageDialog(inventoryWindow, INVALID_NUMBER);
 		    } catch (Exception ex) {
 		        ex.printStackTrace();
 		        JOptionPane.showMessageDialog(inventoryWindow, "Error processing return: " + ex.getMessage());
@@ -727,7 +750,7 @@ public class Dashboard
 		
 		// PROCESS EXCHANGE BUTTON
 	    JButton processExchangeButton = new JButton("Process Exchange");
-	    processExchangeButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    processExchangeButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    bottomPanel.add(processExchangeButton);
 	
 	    processExchangeButton.addActionListener(e -> {
@@ -805,7 +828,7 @@ public class Dashboard
 	                // Refresh the table
 	                List<Item> updatedItems = loadItemsFromDatabase();
 	                DefaultTableModel model = new DefaultTableModel(
-	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+	                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
 	                );
 	
 	                for (Item item : updatedItems) {
@@ -832,7 +855,7 @@ public class Dashboard
 	            }
 	
 	        } catch (NumberFormatException ex) {
-	            JOptionPane.showMessageDialog(inventoryWindow, "Invalid number entered. Please try again.");
+	            JOptionPane.showMessageDialog(inventoryWindow, INVALID_NUMBER);
 	        } catch (Exception ex) {
 	            ex.printStackTrace();
 	            JOptionPane.showMessageDialog(inventoryWindow, "Error processing exchange: " + ex.getMessage());
@@ -841,7 +864,7 @@ public class Dashboard
 
 	    // VIEW RETURN HISTORY BUTTON
 		JButton viewReturnHistoryButton = new JButton("View Return History");
-		viewReturnHistoryButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		viewReturnHistoryButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 16));
 		bottomPanel.add(viewReturnHistoryButton);
 		
 		viewReturnHistoryButton.addActionListener(e -> {
@@ -869,7 +892,7 @@ public class Dashboard
 		            "Return History for Item ID: " + itemId, JOptionPane.INFORMATION_MESSAGE);
 		
 		    } catch (NumberFormatException ex) {
-		        JOptionPane.showMessageDialog(inventoryWindow, "Invalid item ID.");
+		        JOptionPane.showMessageDialog(inventoryWindow, INVALID_ITEM_ID);
 		    } catch (Exception ex) {
 		        ex.printStackTrace();
 		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving history: " + ex.getMessage());
@@ -878,7 +901,7 @@ public class Dashboard
 		
 		// VIEW EXCHANGE HISTORY BUTTON
 		JButton viewExchangeHistoryButton = new JButton("View Exchange History");
-		viewExchangeHistoryButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		viewExchangeHistoryButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 16));
 		bottomPanel.add(viewExchangeHistoryButton);
 		
 		viewExchangeHistoryButton.addActionListener(e -> {
@@ -907,7 +930,7 @@ public class Dashboard
 		            "Exchange History for Item ID: " + itemId, JOptionPane.INFORMATION_MESSAGE);
 		
 		    } catch (NumberFormatException ex) {
-		        JOptionPane.showMessageDialog(inventoryWindow, "Invalid item ID.");
+		        JOptionPane.showMessageDialog(inventoryWindow, INVALID_ITEM_ID);
 		    } catch (Exception ex) {
 		        ex.printStackTrace();
 		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving history: " + ex.getMessage());
@@ -916,7 +939,7 @@ public class Dashboard
 		
 		// VIEW SALES HISTORY BUTTON
 		JButton viewSalesHistoryButton = new JButton("View Sales History");
-		viewSalesHistoryButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		viewSalesHistoryButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 16));
 		bottomPanel.add(viewSalesHistoryButton);
 		
 		viewSalesHistoryButton.addActionListener(e -> {
@@ -944,7 +967,7 @@ public class Dashboard
 		            "Sales History for Item ID: " + itemId, JOptionPane.INFORMATION_MESSAGE);
 		
 		    } catch (NumberFormatException ex) {
-		        JOptionPane.showMessageDialog(inventoryWindow, "Invalid item ID.");
+		        JOptionPane.showMessageDialog(inventoryWindow, INVALID_ITEM_ID);
 		    } catch (Exception ex) {
 		        ex.printStackTrace();
 		        JOptionPane.showMessageDialog(inventoryWindow, "Error retrieving sales history: " + ex.getMessage());
@@ -953,7 +976,7 @@ public class Dashboard
 	    
 		// VIEW OVERALL SALES SUMMARY BUTTON
 		JButton viewSalesSummaryButton = new JButton("Sales Summary");
-		viewSalesSummaryButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		viewSalesSummaryButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 16));
 		bottomPanel.add(viewSalesSummaryButton);
 		
 		viewSalesSummaryButton.addActionListener(e -> {
@@ -976,7 +999,7 @@ public class Dashboard
 	    
 	    //Filter 
 	    JButton filterButton = new JButton("Filter Items");
-	    filterButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+	    filterButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
 	    bottomPanel.add(filterButton);
 
 	    // Highlight low stock when the window opens
@@ -1028,28 +1051,28 @@ public class Dashboard
 	                    ResultSet rs = stmt.executeQuery();
 	                    while (rs.next()) {
 	                        Supplier sup = null;
-	                        if (rs.getInt("supplier_id") != 0) {
+	                        if (rs.getInt(FIELD_SUPPLIER_ID) != 0) {
 	                            sup = new Supplier(
-	                                rs.getInt("supplier_id"),
-	                                rs.getString("supplierName"),
-	                                rs.getString("supplierContact")
+	                                rs.getInt(FIELD_SUPPLIER_ID),
+	                                rs.getString(FIELD_SUPPLIER_NAME),
+	                                rs.getString(FIELD_SUPPLIER_CONTACT)
 	                            );
 	                        }
 	                        filteredItems.add(new Item(
-	                            rs.getInt("itemId"),
-	                            rs.getString("itemName"),
-	                            rs.getString("category"),
+	                            rs.getInt(FIELD_ITEM_ID),
+	                            rs.getString(FIELD_ITEM_NAME),
+	                            rs.getString(FIELD_CATEGORY),
 	                            rs.getString("size"),
-	                            rs.getString("colour"),
-	                            rs.getDouble("price"),
-	                            rs.getInt("quantity"),
+	                            rs.getString(FIELD_COLOUR),
+	                            rs.getDouble(FIELD_PRICE),
+	                            rs.getInt(FIELD_QUANTITY),
 	                            sup
 	                        ));
 	                    }
 	                }
 
 	                DefaultTableModel model = new DefaultTableModel(
-	                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0);
+	                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0);
 
 	                for (Item item : filteredItems) {
 	                    model.addRow(new Object[]{
@@ -1075,7 +1098,7 @@ public class Dashboard
 
         
         JButton organizeButton = new JButton("Organize Items");
-        organizeButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        organizeButton.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 18));
         bottomPanel.add(organizeButton);
 
         JPopupMenu organizeMenu = new JPopupMenu();
@@ -1103,7 +1126,7 @@ public class Dashboard
                 List<Item> organizedItems = inventory.organizeByCategory();
                 
                 DefaultTableModel model = new DefaultTableModel(
-                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
                 );
 
                 for (Item item : organizedItems) {
@@ -1136,7 +1159,7 @@ public class Dashboard
                 List<Item> organizedItems = inventory.organizeBySize();
                 
                 DefaultTableModel model = new DefaultTableModel(
-                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
                 );
 
                 for (Item item : organizedItems) {
@@ -1169,7 +1192,7 @@ public class Dashboard
                 List<Item> organizedItems = inventory.organizeByColour();
                 
                 DefaultTableModel model = new DefaultTableModel(
-                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
                 );
 
                 for (Item item : organizedItems) {
@@ -1202,7 +1225,7 @@ public class Dashboard
                 List<Item> organizedItems = inventory.organizeByPrice();
                 
                 DefaultTableModel model = new DefaultTableModel(
-                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
                 );
 
                 for (Item item : organizedItems) {
@@ -1259,24 +1282,24 @@ public class Dashboard
                     try (ResultSet rs = stmt.executeQuery()) {
                         while (rs.next()) {
                             Supplier supplier = null;
-                            int supplierId = rs.getInt("supplier_id");
+                            int supplierId = rs.getInt(FIELD_SUPPLIER_ID);
                             
                             if (!rs.wasNull()) {
                                 supplier = new Supplier(
                                     supplierId,
-                                    rs.getString("supplierName"),
-                                    rs.getString("supplierContact")
+                                    rs.getString(FIELD_SUPPLIER_NAME),
+                                    rs.getString(FIELD_SUPPLIER_CONTACT)
                                 );
                             }
 
                             Item item = new Item(
-                                rs.getInt("itemId"),
-                                rs.getString("itemName"),
-                                rs.getString("category"),
-                                rs.getString("size"),
-                                rs.getString("colour"),
-                                rs.getDouble("price"),
-                                rs.getInt("quantity"),
+                                rs.getInt(FIELD_ITEM_ID),
+	                            rs.getString(FIELD_ITEM_NAME),
+	                            rs.getString(FIELD_CATEGORY),
+	                            rs.getString("size"),
+	                            rs.getString(FIELD_COLOUR),
+	                            rs.getDouble(FIELD_PRICE),
+	                            rs.getInt(FIELD_QUANTITY),
                                 supplier
                             );
 
@@ -1294,7 +1317,7 @@ public class Dashboard
                 }
 
                 DefaultTableModel model = new DefaultTableModel(
-                    new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                    new String[]{"ID", "Name", CATEGORY, "Size", COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
                 );
 
                 for (Item item : supplierItems) {
@@ -1379,7 +1402,7 @@ public class Dashboard
             }
 
             JTable supplierTable = new JTable(supplierModel);
-            supplierTable.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            supplierTable.setFont(new Font(SANSSERIF_FONT, Font.PLAIN, 14));
             supplierTable.setRowHeight(25);
             
             JScrollPane supplierScrollPane = new JScrollPane(supplierTable);
@@ -1486,7 +1509,7 @@ public class Dashboard
                     
                     List<Item> updatedItems = loadItemsFromDatabase();
                     DefaultTableModel model = new DefaultTableModel(
-                        new String[]{"ID", "Name", "Category", "Size", "Colour", "Quantity", "Price (€)", "Supplier"}, 0
+                        new String[]{"ID", "Name", CATEGORY, "Size",COLOUR, QUANTITY, PRICE_EURO, SUPPLIER}, 0
                     );
 
                     for (Item item : updatedItems) {
@@ -1563,21 +1586,21 @@ public class Dashboard
             while (rs.next())
             {
                 Supplier supplier = null;
-                if (rs.getInt("supplier_id") != 0)
+                if (rs.getInt(FIELD_SUPPLIER_ID) != 0)
                 {
-                    supplier = new Supplier(rs.getInt("supplier_id"),
-                            rs.getString("supplierName"),
-                            rs.getString("supplierContact"));
+                    supplier = new Supplier(rs.getInt(FIELD_SUPPLIER_ID),
+                            rs.getString(FIELD_SUPPLIER_NAME),
+                            rs.getString(FIELD_SUPPLIER_CONTACT));
                 }
 
                 items.add(new Item(
-                        rs.getInt("itemId"),
-                        rs.getString("itemName"),
-                        rs.getString("category"),
+                        rs.getInt(FIELD_ITEM_ID),
+                        rs.getString(FIELD_ITEM_NAME),
+                        rs.getString(FIELD_CATEGORY),
                         rs.getString("size"),
-                        rs.getString("colour"),
-                        rs.getDouble("price"),
-                        rs.getInt("quantity"),
+                        rs.getString(FIELD_COLOUR),
+                        rs.getDouble(FIELD_PRICE),
+                        rs.getInt(FIELD_QUANTITY),
                         supplier
                 ));
             }
