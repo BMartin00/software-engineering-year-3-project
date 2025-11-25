@@ -61,7 +61,7 @@ public class User
 
     public boolean login(String username, String password)
     {
-    		String query = "SELECT * FROM users WHERE username=? AND password=?";
+    		String query = "SELECT user_id, username, role FROM users WHERE username=? AND password=?";
     	
         try (Connection conn = DatabaseConnection.getConnection();
         		PreparedStatement stmt = conn.prepareStatement(query))

@@ -93,7 +93,7 @@ public class Inventory
 
 	public List<Supplier> getAllSuppliers() {
 	    List<Supplier> suppliers = new ArrayList<>();
-	    String sql = "SELECT * FROM suppliers ORDER BY name";
+	    String sql = "SELECT supplier_id, name, contact FROM suppliers ORDER BY name";
 	    
 	    try (Connection conn = DatabaseConnection.getConnection();
 	         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -461,7 +461,7 @@ public class Inventory
 	
 	public void updateItem(int itemId)
 	{
-		String selectSQL = "SELECT * FROM items WHERE itemId = ?";
+		String selectSQL = "SELECT itemName, category, size, colour, price, quantity FROM items WHERE itemId = ?";
 		String updateSQL = "UPDATE items SET itemName=?, category=?, size=?, colour=?, price=?, quantity=? WHERE itemId=?";
 		
 	    try (Connection conn = DatabaseConnection.getConnection();

@@ -85,7 +85,7 @@ public class Dashboard
             return;
         }
 
-        String query = "SELECT * FROM users WHERE username=? AND password=?";
+        String query = "SELECT user_id, username, password, role FROM users WHERE username=? AND password=?";
         try (Connection conn = DatabaseConnection.getConnection();
         		PreparedStatement stmt = conn.prepareStatement(query))
         {
@@ -136,7 +136,7 @@ public class Dashboard
             return;
         }
 
-        String checkQuery = "SELECT * FROM users WHERE username=?";
+        String checkQuery = "SELECT username FROM users WHERE username=?";
         String insertQuery = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
         
         try (Connection conn = DatabaseConnection.getConnection();
