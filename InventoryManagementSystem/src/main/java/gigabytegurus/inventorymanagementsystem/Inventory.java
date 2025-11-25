@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -16,6 +17,8 @@ import javax.swing.JTextField;
 
 public class Inventory
 {
+	Logger logger = Logger.getLogger(getClass().getName());
+	
 	private List<Item> items;
 	
 	public Inventory() {
@@ -40,11 +43,11 @@ public class Inventory
 	        """;
 	        stmt.execute(createSuppliersTable);
 	        
-	        System.out.println("Database tables initialized successfully.");
+	        logger.info("Database tables initialized successfully.");
 	        
 	    } catch (SQLException e) {
 	        e.printStackTrace();
-	        System.err.println("Error initializing database tables: " + e.getMessage());
+	        logger.info("Error initializing database tables: " + e.getMessage());
 	    }
 	}
 	
@@ -70,7 +73,7 @@ public class Inventory
 	        stmt.executeUpdate();
 	        stmt.close();
 	        
-	        System.out.println("Supplier '" + supplier.getName() + "' added successfully!");
+	        logger.info("Supplier '" + supplier.getName() + "' added successfully!");
 	        
 	        if (!testMode) {
 	            JOptionPane.showMessageDialog(null, "Supplier '" + supplier.getName() + "' added successfully!");
@@ -124,7 +127,7 @@ public class Inventory
 	        stmt.executeUpdate();
 	        stmt.close();
 	        
-	        System.out.println("Item supplier updated successfully.");
+	        logger.info("Item supplier updated successfully.");
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }

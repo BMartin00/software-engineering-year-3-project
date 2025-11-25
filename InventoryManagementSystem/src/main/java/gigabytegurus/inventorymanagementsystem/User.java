@@ -1,9 +1,11 @@
 package gigabytegurus.inventorymanagementsystem;
 
 import java.sql.*;
+import java.util.logging.Logger;
 
 public class User
 {
+	Logger logger = Logger.getLogger(getClass().getName());
     private int userId;
     private String username;
     private String password;
@@ -94,13 +96,13 @@ public class User
         }
         catch (SQLException e)
         {
-            System.out.println("⚠️ Registration failed: " + e.getMessage());
+            logger.info("⚠️ Registration failed: " + e.getMessage());
         }
         return false;
     }
 
     public void logout()
     {
-        System.out.println("User logged out");
+        logger.info("User logged out");
     }
 }
