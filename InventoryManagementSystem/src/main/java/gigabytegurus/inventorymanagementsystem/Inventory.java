@@ -21,6 +21,17 @@ public class Inventory
 	
 	private List<Item> items;
 	
+	private static final String ITEM_ID = "itemId";
+    private static final String ITEM_NAME = "itemName";
+    private static final String CATEGORY = "category";
+    private static final String COLOUR = "colour";
+    private static final String PRICE = "price";
+    private static final String QUANTITY = "quantity";
+    
+    private static final String SUPPLIER_ID = "supplier_id";
+    private static final String SUPPLIER_NAME = "supplierName";
+    private static final String SUPPLIER_CONTACT = "supplierContact";
+	
 	public Inventory() {
         this.items = new ArrayList<>();
         initializeDatabaseTables();
@@ -100,7 +111,7 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = new Supplier(
-	                rs.getInt("supplier_id"),
+	                rs.getInt(SUPPLIER_ID),
 	                rs.getString("name"),
 	                rs.getString("contact")
 	            );
@@ -148,18 +159,18 @@ public class Inventory
 	            while (rs.next()) {
 	                Supplier supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 
 	                Item item = new Item(
-	                    rs.getInt("itemId"),
-	                    rs.getString("itemName"),
-	                    rs.getString("category"),
+	                    rs.getInt(ITEM_ID),
+	                    rs.getString(ITEM_NAME),
+	                    rs.getString(CATEGORY),
 	                    rs.getString("size"),
-	                    rs.getString("colour"),
-	                    rs.getDouble("price"),
-	                    rs.getInt("quantity"),
+	                    rs.getString(COLOUR),
+	                    rs.getDouble(PRICE),
+	                    rs.getInt(QUANTITY),
 	                    supplier
 	                );
 
@@ -185,24 +196,24 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = null;
-	            int supplierId = rs.getInt("supplier_id");
+	            int supplierId = rs.getInt(SUPPLIER_ID);
 	            
 	            if (!rs.wasNull()) {
 	                supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 	            }
 
 	            Item item = new Item(
-	                rs.getInt("itemId"),
-	                rs.getString("itemName"),
-	                rs.getString("category"),
+	                rs.getInt(ITEM_ID),
+	                rs.getString(ITEM_NAME),
+	                rs.getString(CATEGORY),
 	                rs.getString("size"),
-	                rs.getString("colour"),
-	                rs.getDouble("price"),
-	                rs.getInt("quantity"),
+	                rs.getString(COLOUR),
+	                rs.getDouble(PRICE),
+	                rs.getInt(QUANTITY),
 	                supplier
 	            );
 
@@ -239,24 +250,24 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = null;
-	            int supplierId = rs.getInt("supplier_id");
+	            int supplierId = rs.getInt(SUPPLIER_ID);
 	            
 	            if (!rs.wasNull()) {
 	                supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 	            }
 
 	            Item item = new Item(
-	                rs.getInt("itemId"),
-	                rs.getString("itemName"),
-	                rs.getString("category"),
+	                rs.getInt(ITEM_ID),
+	                rs.getString(ITEM_NAME),
+	                rs.getString(CATEGORY),
 	                rs.getString("size"),
-	                rs.getString("colour"),
-	                rs.getDouble("price"),
-	                rs.getInt("quantity"),
+	                rs.getString(COLOUR),
+	                rs.getDouble(PRICE),
+	                rs.getInt(QUANTITY),
 	                supplier
 	            );
 
@@ -280,24 +291,24 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = null;
-	            int supplierId = rs.getInt("supplier_id");
+	            int supplierId = rs.getInt(SUPPLIER_ID);
 	            
 	            if (!rs.wasNull()) {
 	                supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 	            }
 
 	            Item item = new Item(
-	                rs.getInt("itemId"),
-	                rs.getString("itemName"),
-	                rs.getString("category"),
+	                rs.getInt(ITEM_ID),
+	                rs.getString(ITEM_NAME),
+	                rs.getString(CATEGORY),
 	                rs.getString("size"),
-	                rs.getString("colour"),
-	                rs.getDouble("price"),
-	                rs.getInt("quantity"),
+	                rs.getString(COLOUR),
+	                rs.getDouble(PRICE),
+	                rs.getInt(QUANTITY),
 	                supplier
 	            );
 
@@ -321,24 +332,24 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = null;
-	            int supplierId = rs.getInt("supplier_id");
+	            int supplierId = rs.getInt(SUPPLIER_ID);
 	            
 	            if (!rs.wasNull()) {
 	                supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 	            }
 
 	            Item item = new Item(
-	                rs.getInt("itemId"),
-	                rs.getString("itemName"),
-	                rs.getString("category"),
+	                rs.getInt(ITEM_ID),
+	                rs.getString(ITEM_NAME),
+	                rs.getString(CATEGORY),
 	                rs.getString("size"),
-	                rs.getString("colour"),
-	                rs.getDouble("price"),
-	                rs.getInt("quantity"),
+	                rs.getString(COLOUR),
+	                rs.getDouble(PRICE),
+	                rs.getInt(QUANTITY),
 	                supplier
 	            );
 
@@ -364,24 +375,24 @@ public class Inventory
 	        try (ResultSet rs = stmt.executeQuery()) {
 	            while (rs.next()) {
 	                Supplier supplier = null;
-	                int supplierId = rs.getInt("supplier_id");
+	                int supplierId = rs.getInt(SUPPLIER_ID);
 	                
 	                if (!rs.wasNull()) {
 	                    supplier = new Supplier(
 	                        supplierId,
-	                        rs.getString("supplierName"),
-	                        rs.getString("supplierContact")
+	                        rs.getString(SUPPLIER_NAME),
+	                        rs.getString(SUPPLIER_CONTACT)
 	                    );
 	                }
 
 	                Item item = new Item(
-	                    rs.getInt("itemId"),
-	                    rs.getString("itemName"),
-	                    rs.getString("category"),
+	                    rs.getInt(ITEM_ID),
+	                    rs.getString(ITEM_NAME),
+	                    rs.getString(CATEGORY),
 	                    rs.getString("size"),
-	                    rs.getString("colour"),
-	                    rs.getDouble("price"),
-	                    rs.getInt("quantity"),
+	                    rs.getString(COLOUR),
+	                    rs.getDouble(PRICE),
+	                    rs.getInt(QUANTITY),
 	                    supplier
 	                );
 
@@ -479,12 +490,12 @@ public class Inventory
 
 	        if (!testMode) {
 
-	            JTextField nameField = new JTextField(rs.getString("itemName"), 15);
-	            JTextField categoryField = new JTextField(rs.getString("category"), 15);
+	            JTextField nameField = new JTextField(rs.getString(ITEM_NAME), 15);
+	            JTextField categoryField = new JTextField(rs.getString(CATEGORY), 15);
 	            JTextField sizeField = new JTextField(rs.getString("size"), 10);
-	            JTextField colourField = new JTextField(rs.getString("colour"), 10);
-	            JTextField priceField = new JTextField(String.valueOf(rs.getDouble("price")), 10);
-	            JTextField quantityField = new JTextField(String.valueOf(rs.getInt("quantity")), 10);
+	            JTextField colourField = new JTextField(rs.getString(COLOUR), 10);
+	            JTextField priceField = new JTextField(String.valueOf(rs.getDouble(PRICE)), 10);
+	            JTextField quantityField = new JTextField(String.valueOf(rs.getInt(QUANTITY)), 10);
 
 	            JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
 	            panel.add(new JLabel("Item Name:"));
@@ -527,12 +538,12 @@ public class Inventory
 
 	        }
 	        else {
-	            name = rs.getString("itemName").trim();
-	            category = rs.getString("category").trim();
+	            name = rs.getString(ITEM_NAME).trim();
+	            category = rs.getString(CATEGORY).trim();
 	            size = rs.getString("size").trim();
-	            colour = rs.getString("colour").trim();
-	            price = rs.getDouble("price");
-	            quantity = rs.getInt("quantity");
+	            colour = rs.getString(COLOUR).trim();
+	            price = rs.getDouble(PRICE);
+	            quantity = rs.getInt(QUANTITY);
 	        }
 
 	        if (name.isEmpty()) throw new IllegalArgumentException("Item name cannot be empty.");
@@ -606,24 +617,24 @@ public class Inventory
 	        try (ResultSet rs = stmt.executeQuery()) {
 	            while (rs.next()) {
 	                Supplier supplier = null;
-	                int supplierId = rs.getInt("supplier_id");
+	                int supplierId = rs.getInt(SUPPLIER_ID);
 	                
 	                if (!rs.wasNull()) {
 	                    supplier = new Supplier(
 	                        supplierId,
-	                        rs.getString("supplierName"),
-	                        rs.getString("supplierContact")
+	                        rs.getString(SUPPLIER_NAME),
+	                        rs.getString(SUPPLIER_CONTACT)
 	                    );
 	                }
 
 	                Item item = new Item(
-	                    rs.getInt("itemId"),
-	                    rs.getString("itemName"),
-	                    rs.getString("category"),
+	                    rs.getInt(ITEM_ID),
+	                    rs.getString(ITEM_NAME),
+	                    rs.getString(CATEGORY),
 	                    rs.getString("size"),
-	                    rs.getString("colour"),
-	                    rs.getDouble("price"),
-	                    rs.getInt("quantity"),
+	                    rs.getString(COLOUR),
+	                    rs.getDouble(PRICE),
+	                    rs.getInt(QUANTITY),
 	                    supplier
 	                );
 
