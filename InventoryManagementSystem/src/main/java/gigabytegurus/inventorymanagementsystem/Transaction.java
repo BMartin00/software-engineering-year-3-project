@@ -4,18 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import javax.swing.JOptionPane;
 
 public class Transaction
 {
-    private int transactionId;
-    private Item item;
-    private int quantity;
-    private String type;
-    private Date date;
-    private String reason;
-    
     // Add test mode flag to prevent GUI popups during testing
     public static boolean testMode = false;
 	

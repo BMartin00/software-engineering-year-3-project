@@ -15,13 +15,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Report
 {
-    private int reportId;
-    private Date reportDate;
-    private String content;
-    
-    
-    
-
  // PDF METHOD 
     public void generatePDF(List<Item> items, String filePath)
     {
