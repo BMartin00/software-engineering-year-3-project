@@ -17,6 +17,8 @@ import javax.swing.JTextField;
 
 public class Inventory
 {
+	
+	public static boolean globalTestMode = false;
 	Logger logger = Logger.getLogger(getClass().getName());
 	
 	private List<Item> items;
@@ -34,7 +36,9 @@ public class Inventory
 	
 	public Inventory() {
         this.items = new ArrayList<>();
+        this.testMode = globalTestMode;
         initializeDatabaseTables();
+        
     }
 	
 	public boolean testMode = false;

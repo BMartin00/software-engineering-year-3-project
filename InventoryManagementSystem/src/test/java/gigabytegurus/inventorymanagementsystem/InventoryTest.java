@@ -19,6 +19,8 @@ public class InventoryTest extends TestCase{
         super.setUp();
         inventory = new Inventory();
         inventory.testMode = true;
+        Inventory.globalTestMode = true;
+        Dashboard.testMode = true;
     }
 	
 	/* ADD ITEM TESTS */
