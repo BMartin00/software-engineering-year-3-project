@@ -361,8 +361,5 @@ public class Transaction
 	}
 
 	
-	public void processReturn()
-	{
-		
-	}
+	
 }
