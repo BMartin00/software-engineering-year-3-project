@@ -44,6 +44,48 @@
   	<sonar.organization>bmartin00</sonar.organization>
     <sonar.projectKey>BMartin00_software-engineering-year-3-project</sonar.projectKey>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.release>17</maven.compiler.release>
   </properties>
+  
+  <build>
+	  <plugins>
+	    <!-- JaCoCo for coverage -->
+	    <plugin>
+	      <groupId>org.jacoco</groupId>
+	      <artifactId>jacoco-maven-plugin</artifactId>
+	      <version>0.8.11</version>
+	      <executions>
+	        <execution>
+	          <goals>
+	            <goal>prepare-agent</goal>
+	          </goals>
+	        </execution>
+	        <execution>
+	          <id>report</id>
+	          <phase>test</phase>
+	          <goals>
+	            <goal>report</goal>
+	          </goals>
+	        </execution>
+	      </executions>
+	    </plugin>
+	    <!-- Maven Surefire for running JUnit tests -->
+	    <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-surefire-plugin</artifactId>
+	      <version>3.2.5</version>
+	    </plugin>
+	    <!-- SonarScanner for Maven -->
+	    <plugin>
+	      <groupId>org.sonarsource.scanner.maven</groupId>
+	      <artifactId>sonar-maven-plugin</artifactId>
+	      <version>4.0.0.4121</version>
+	    </plugin>
+	  </plugins>
+  </build>
   
 </project>
