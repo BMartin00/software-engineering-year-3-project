@@ -1,9 +1,11 @@
 package gigabytegurus.inventorymanagementsystem;
 
 import java.sql.*;
+import java.util.logging.Logger;
 
 public class User
 {
+	Logger logger = Logger.getLogger(getClass().getName());
     private int userId;
     private String username;
     private String password;
@@ -59,10 +61,11 @@ public class User
 
     public boolean login(String username, String password)
     {
-        try (Connection conn = DatabaseConnection.getConnection())
+    		String query = "SELECT user_id, username, role FROM users WHERE username=? AND password=?";
+    	
+        try (Connection conn = DatabaseConnection.getConnection();
+        		PreparedStatement stmt = conn.prepareStatement(query))
         {
-            String query = "SELECT * FROM users WHERE username=? AND password=?";
-            PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, username);
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
@@ -82,25 +85,27 @@ public class User
 
     public boolean register(String username, String password, String role)
     {
-        try (Connection conn = DatabaseConnection.getConnection())
+    		String query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)"; 
+    	
+        try (Connection conn = DatabaseConnection.getConnection();
+        		PreparedStatement stmt = conn.prepareStatement(query))
         {
-            String query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, username);
             stmt.setString(2, password);
             stmt.setString(3, role);
+            
             stmt.executeUpdate();
             return true;
         }
         catch (SQLException e)
         {
-            System.out.println("⚠️ Registration failed: " + e.getMessage());
+            logger.info("⚠️ Registration failed: " + e.getMessage());
         }
         return false;
     }
 
     public void logout()
     {
-        System.out.println("User logged out");
+        logger.info("User logged out");
     }
 }

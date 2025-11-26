@@ -4,18 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import javax.swing.JOptionPane;
 
 public class Transaction
 {
-    private int transactionId;
-    private Item item;
-    private int quantity;
-    private String type;
-    private Date date;
-    private String reason;
-    
+	private static final String ITEM_NAME = "itemName";
+	private static final String DATE = "Date:";
+	
     // Add test mode flag to prevent GUI popups during testing
     public static boolean testMode = false;
 	
@@ -147,7 +142,7 @@ public class Transaction
                     return false;
                 }
                 int currentStock = rs.getInt("quantity");
-                newItemName = rs.getString("itemName");
+                newItemName = rs.getString(ITEM_NAME);
                 if (currentStock < newItemQuantity) {
                     if (!testMode) {
 					    JOptionPane.showMessageDialog(null, 
@@ -168,7 +163,7 @@ public class Transaction
 					}
                     return false;
                 }
-                returnedItemName = rs.getString("itemName");
+                returnedItemName = rs.getString(ITEM_NAME);
             }
 
             // Record exchange in item_exchanges table
@@ -228,9 +223,9 @@ public class Transaction
 
             history.append("=== RETURN HISTORY ===\n");
             while (rs.next()) {
-                history.append("Date: ").append(rs.getTimestamp("return_date"))
+                history.append(DATE).append(rs.getTimestamp("return_date"))
                       .append(" | Quantity: ").append(rs.getInt("quantity_returned"))
-                      .append(" | Item: ").append(rs.getString("itemName"))
+                      .append(" | Item: ").append(rs.getString(ITEM_NAME))
                       .append(" | Reason: ").append(rs.getString("reason"))
                       .append("\n");
             }
@@ -260,7 +255,7 @@ public class Transaction
 
             history.append("=== EXCHANGE HISTORY ===\n");
             while (rs.next()) {
-                history.append("Date: ").append(rs.getTimestamp("exchange_date"))
+                history.append(DATE).append(rs.getTimestamp("exchange_date"))
                       .append(" | Returned: ").append(rs.getInt("returned_quantity")).append(" ").append(rs.getString("returnedItem"))
                       .append(" | New: ").append(rs.getInt("new_quantity")).append(" ").append(rs.getString("newItem"))
                       .append(" | Reason: ").append(rs.getString("reason"))
@@ -297,9 +292,9 @@ public class Transaction
 	            int quantitySold = rs.getInt("quantity_sold");
 	            double saleTotal = itemPrice * quantitySold;
 	            
-	            history.append("Date: ").append(rs.getTimestamp("sale_date"))
+	            history.append(DATE).append(rs.getTimestamp("sale_date"))
 	                  .append(" | Quantity: ").append(quantitySold)
-	                  .append(" | Item: ").append(rs.getString("itemName"))
+	                  .append(" | Item: ").append(rs.getString(ITEM_NAME))
 	                  .append(" | Price: €").append(String.format("%.2f", itemPrice))
 	                  .append(" | Total: €").append(String.format("%.2f", saleTotal))
 	                  .append("\n");
@@ -346,7 +341,7 @@ public class Transaction
 	            int totalSold = rs.getInt("total_sold");
 	            double totalRevenue = rs.getDouble("total_revenue");
 	            
-	            summary.append("Item: ").append(rs.getString("itemName"))
+	            summary.append("Item: ").append(rs.getString(ITEM_NAME))
 	                  .append(" | Total Sold: ").append(totalSold)
 	                  .append(" | Total Revenue: €").append(String.format("%.2f", totalRevenue))
 	                  .append("\n");
@@ -366,8 +361,5 @@ public class Transaction
 	}
 
 	
-	public void processReturn()
-	{
-		
-	}
+	
 }

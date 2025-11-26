@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -16,11 +17,28 @@ import javax.swing.JTextField;
 
 public class Inventory
 {
+	
+	public static boolean globalTestMode = false;
+	Logger logger = Logger.getLogger(getClass().getName());
+	
 	private List<Item> items;
+	
+	private static final String ITEM_ID = "itemId";
+    private static final String ITEM_NAME = "itemName";
+    private static final String CATEGORY = "category";
+    private static final String COLOUR = "colour";
+    private static final String PRICE = "price";
+    private static final String QUANTITY = "quantity";
+    
+    private static final String SUPPLIER_ID = "supplier_id";
+    private static final String SUPPLIER_NAME = "supplierName";
+    private static final String SUPPLIER_CONTACT = "supplierContact";
 	
 	public Inventory() {
         this.items = new ArrayList<>();
+        this.testMode = globalTestMode;
         initializeDatabaseTables();
+        
     }
 	
 	public boolean testMode = false;
@@ -33,18 +51,18 @@ public class Inventory
 	        // Create suppliers table if it doesn't exist
 	        String createSuppliersTable = """
 	            CREATE TABLE IF NOT EXISTS suppliers (
-	                supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	                supplier_id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	                name TEXT NOT NULL,
 	                contact TEXT NOT NULL
 	            )
 	        """;
 	        stmt.execute(createSuppliersTable);
 	        
-	        System.out.println("Database tables initialized successfully.");
+	        logger.info("Database tables initialized successfully.");
 	        
 	    } catch (SQLException e) {
 	        e.printStackTrace();
-	        System.err.println("Error initializing database tables: " + e.getMessage());
+	        logger.info("Error initializing database tables: " + e.getMessage());
 	    }
 	}
 	
@@ -60,17 +78,17 @@ public class Inventory
 	        throw new IllegalArgumentException("Supplier contact cannot be empty.");
 	    }
 
-	    try (Connection conn = DatabaseConnection.getConnection()) {
-	        String sql = "INSERT INTO suppliers (name, contact) VALUES (?, ?)";
-	        PreparedStatement stmt = conn.prepareStatement(sql);
+	    String sql = "INSERT INTO suppliers (name, contact) VALUES (?, ?)";
+	    
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        
 	        stmt.setString(1, supplier.getName());
 	        stmt.setString(2, supplier.getContact());
 
 	        stmt.executeUpdate();
-	        stmt.close();
 	        
-	        System.out.println("Supplier '" + supplier.getName() + "' added successfully!");
+	        logger.info("Supplier '" + supplier.getName() + "' added successfully!");
 	        
 	        if (!testMode) {
 	            JOptionPane.showMessageDialog(null, "Supplier '" + supplier.getName() + "' added successfully!");
@@ -89,7 +107,7 @@ public class Inventory
 
 	public List<Supplier> getAllSuppliers() {
 	    List<Supplier> suppliers = new ArrayList<>();
-	    String sql = "SELECT * FROM suppliers ORDER BY name";
+	    String sql = "SELECT supplier_id, name, contact FROM suppliers ORDER BY name";
 	    
 	    try (Connection conn = DatabaseConnection.getConnection();
 	         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -97,7 +115,7 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = new Supplier(
-	                rs.getInt("supplier_id"),
+	                rs.getInt(SUPPLIER_ID),
 	                rs.getString("name"),
 	                rs.getString("contact")
 	            );
@@ -110,9 +128,10 @@ public class Inventory
 	}
 
 	public void updateItemSupplier(int itemId, int supplierId) {
-	    try (Connection conn = DatabaseConnection.getConnection()) {
-	        String sql = "UPDATE items SET supplier_id = ? WHERE itemId = ?";
-	        PreparedStatement stmt = conn.prepareStatement(sql);
+		String sql = "UPDATE items SET supplier_id = ? WHERE itemId = ?";
+		
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        
 	        if (supplierId > 0) {
 	            stmt.setInt(1, supplierId);
@@ -122,9 +141,8 @@ public class Inventory
 	        
 	        stmt.setInt(2, itemId);
 	        stmt.executeUpdate();
-	        stmt.close();
 	        
-	        System.out.println("Item supplier updated successfully.");
+	        logger.info("Item supplier updated successfully.");
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
@@ -145,18 +163,18 @@ public class Inventory
 	            while (rs.next()) {
 	                Supplier supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 
 	                Item item = new Item(
-	                    rs.getInt("itemId"),
-	                    rs.getString("itemName"),
-	                    rs.getString("category"),
+	                    rs.getInt(ITEM_ID),
+	                    rs.getString(ITEM_NAME),
+	                    rs.getString(CATEGORY),
 	                    rs.getString("size"),
-	                    rs.getString("colour"),
-	                    rs.getDouble("price"),
-	                    rs.getInt("quantity"),
+	                    rs.getString(COLOUR),
+	                    rs.getDouble(PRICE),
+	                    rs.getInt(QUANTITY),
 	                    supplier
 	                );
 
@@ -182,24 +200,24 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = null;
-	            int supplierId = rs.getInt("supplier_id");
+	            int supplierId = rs.getInt(SUPPLIER_ID);
 	            
 	            if (!rs.wasNull()) {
 	                supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 	            }
 
 	            Item item = new Item(
-	                rs.getInt("itemId"),
-	                rs.getString("itemName"),
-	                rs.getString("category"),
+	                rs.getInt(ITEM_ID),
+	                rs.getString(ITEM_NAME),
+	                rs.getString(CATEGORY),
 	                rs.getString("size"),
-	                rs.getString("colour"),
-	                rs.getDouble("price"),
-	                rs.getInt("quantity"),
+	                rs.getString(COLOUR),
+	                rs.getDouble(PRICE),
+	                rs.getInt(QUANTITY),
 	                supplier
 	            );
 
@@ -236,24 +254,24 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = null;
-	            int supplierId = rs.getInt("supplier_id");
+	            int supplierId = rs.getInt(SUPPLIER_ID);
 	            
 	            if (!rs.wasNull()) {
 	                supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 	            }
 
 	            Item item = new Item(
-	                rs.getInt("itemId"),
-	                rs.getString("itemName"),
-	                rs.getString("category"),
+	                rs.getInt(ITEM_ID),
+	                rs.getString(ITEM_NAME),
+	                rs.getString(CATEGORY),
 	                rs.getString("size"),
-	                rs.getString("colour"),
-	                rs.getDouble("price"),
-	                rs.getInt("quantity"),
+	                rs.getString(COLOUR),
+	                rs.getDouble(PRICE),
+	                rs.getInt(QUANTITY),
 	                supplier
 	            );
 
@@ -277,24 +295,24 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = null;
-	            int supplierId = rs.getInt("supplier_id");
+	            int supplierId = rs.getInt(SUPPLIER_ID);
 	            
 	            if (!rs.wasNull()) {
 	                supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 	            }
 
 	            Item item = new Item(
-	                rs.getInt("itemId"),
-	                rs.getString("itemName"),
-	                rs.getString("category"),
+	                rs.getInt(ITEM_ID),
+	                rs.getString(ITEM_NAME),
+	                rs.getString(CATEGORY),
 	                rs.getString("size"),
-	                rs.getString("colour"),
-	                rs.getDouble("price"),
-	                rs.getInt("quantity"),
+	                rs.getString(COLOUR),
+	                rs.getDouble(PRICE),
+	                rs.getInt(QUANTITY),
 	                supplier
 	            );
 
@@ -318,24 +336,24 @@ public class Inventory
 	        
 	        while (rs.next()) {
 	            Supplier supplier = null;
-	            int supplierId = rs.getInt("supplier_id");
+	            int supplierId = rs.getInt(SUPPLIER_ID);
 	            
 	            if (!rs.wasNull()) {
 	                supplier = new Supplier(
 	                    supplierId,
-	                    rs.getString("supplierName"),
-	                    rs.getString("supplierContact")
+	                    rs.getString(SUPPLIER_NAME),
+	                    rs.getString(SUPPLIER_CONTACT)
 	                );
 	            }
 
 	            Item item = new Item(
-	                rs.getInt("itemId"),
-	                rs.getString("itemName"),
-	                rs.getString("category"),
+	                rs.getInt(ITEM_ID),
+	                rs.getString(ITEM_NAME),
+	                rs.getString(CATEGORY),
 	                rs.getString("size"),
-	                rs.getString("colour"),
-	                rs.getDouble("price"),
-	                rs.getInt("quantity"),
+	                rs.getString(COLOUR),
+	                rs.getDouble(PRICE),
+	                rs.getInt(QUANTITY),
 	                supplier
 	            );
 
@@ -361,24 +379,24 @@ public class Inventory
 	        try (ResultSet rs = stmt.executeQuery()) {
 	            while (rs.next()) {
 	                Supplier supplier = null;
-	                int supplierId = rs.getInt("supplier_id");
+	                int supplierId = rs.getInt(SUPPLIER_ID);
 	                
 	                if (!rs.wasNull()) {
 	                    supplier = new Supplier(
 	                        supplierId,
-	                        rs.getString("supplierName"),
-	                        rs.getString("supplierContact")
+	                        rs.getString(SUPPLIER_NAME),
+	                        rs.getString(SUPPLIER_CONTACT)
 	                    );
 	                }
 
 	                Item item = new Item(
-	                    rs.getInt("itemId"),
-	                    rs.getString("itemName"),
-	                    rs.getString("category"),
+	                    rs.getInt(ITEM_ID),
+	                    rs.getString(ITEM_NAME),
+	                    rs.getString(CATEGORY),
 	                    rs.getString("size"),
-	                    rs.getString("colour"),
-	                    rs.getDouble("price"),
-	                    rs.getInt("quantity"),
+	                    rs.getString(COLOUR),
+	                    rs.getDouble(PRICE),
+	                    rs.getInt(QUANTITY),
 	                    supplier
 	                );
 
@@ -419,13 +437,12 @@ public class Inventory
 	        items.add(item);
 	    }
 	    
-
-	    try (Connection conn = DatabaseConnection.getConnection())
-	    {
-	        String sql = "INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_id) " +
+	    String sql = "INSERT INTO items (itemName, category, size, colour, price, quantity, supplier_id) " +
 	                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
-	        
-	        PreparedStatement stmt = conn.prepareStatement(sql);
+
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement stmt = conn.prepareStatement(sql))
+	    {	        
 	        
 	        stmt.setString(1, item.getName());
 	        stmt.setString(2, item.getCategory());
@@ -444,44 +461,53 @@ public class Inventory
 	        }
 
 	        stmt.executeUpdate();
-	        stmt.close();
 
-	        System.out.println("Item added successfully to database.");
+	        logger.info("Item added successfully to database.");
 	    }
 	    catch (SQLException e)
 	    {
 	        e.printStackTrace();
-	        System.err.println("Error adding item: " + e.getMessage());
+	        logger.severe("Error adding item: " + e.getMessage());
+
 	    }
 	}
 	
 	public void updateItem(int itemId)
 	{
-	    try (Connection conn = DatabaseConnection.getConnection())
+		String selectSQL = "SELECT itemName, category, size, colour, price, quantity FROM items WHERE itemId = ?";
+		String updateSQL = "UPDATE items SET itemName=?, category=?, size=?, colour=?, price=?, quantity=? WHERE itemId=?";
+		
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement updateStmt = conn.prepareStatement(updateSQL);
+	    		PreparedStatement selectStmt = conn.prepareStatement(selectSQL))
 	    {
-	        String selectSQL = "SELECT * FROM items WHERE itemId = ?";
-	        PreparedStatement selectStmt = conn.prepareStatement(selectSQL);
 	        selectStmt.setInt(1, itemId);
 	        ResultSet rs = selectStmt.executeQuery();
 
 	        if (!rs.next()) {
 	            if (!testMode) JOptionPane.showMessageDialog(null, "⚠No item found with ID: " + itemId);
-	            selectStmt.close();
 	            return;
 	        }
 
-	        String name, category, size, colour;
+	        String name;
+	        
+	        String category;
+	        
+	        String size;
+	        
+	        String colour;
+	        
 	        double price;
 	        int quantity;
 
 	        if (!testMode) {
 
-	            JTextField nameField = new JTextField(rs.getString("itemName"), 15);
-	            JTextField categoryField = new JTextField(rs.getString("category"), 15);
+	            JTextField nameField = new JTextField(rs.getString(ITEM_NAME), 15);
+	            JTextField categoryField = new JTextField(rs.getString(CATEGORY), 15);
 	            JTextField sizeField = new JTextField(rs.getString("size"), 10);
-	            JTextField colourField = new JTextField(rs.getString("colour"), 10);
-	            JTextField priceField = new JTextField(String.valueOf(rs.getDouble("price")), 10);
-	            JTextField quantityField = new JTextField(String.valueOf(rs.getInt("quantity")), 10);
+	            JTextField colourField = new JTextField(rs.getString(COLOUR), 10);
+	            JTextField priceField = new JTextField(String.valueOf(rs.getDouble(PRICE)), 10);
+	            JTextField quantityField = new JTextField(String.valueOf(rs.getInt(QUANTITY)), 10);
 
 	            JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
 	            panel.add(new JLabel("Item Name:"));
@@ -505,7 +531,6 @@ public class Inventory
 	            if (result != JOptionPane.OK_OPTION) {
 	                if (!testMode) JOptionPane.showMessageDialog(null, "Edit cancelled. No changes were made.");
 	                rs.close();
-	                selectStmt.close();
 	                return;
 	            }
 
@@ -520,18 +545,17 @@ public class Inventory
 	            } catch (NumberFormatException ex) {
 	                if (!testMode) JOptionPane.showMessageDialog(null, "Invalid number format for price or quantity.");
 	                rs.close();
-	                selectStmt.close();
 	                return;
 	            }
 
 	        }
 	        else {
-	            name = rs.getString("itemName").trim();
-	            category = rs.getString("category").trim();
+	            name = rs.getString(ITEM_NAME).trim();
+	            category = rs.getString(CATEGORY).trim();
 	            size = rs.getString("size").trim();
-	            colour = rs.getString("colour").trim();
-	            price = rs.getDouble("price");
-	            quantity = rs.getInt("quantity");
+	            colour = rs.getString(COLOUR).trim();
+	            price = rs.getDouble(PRICE);
+	            quantity = rs.getInt(QUANTITY);
 	        }
 
 	        if (name.isEmpty()) throw new IllegalArgumentException("Item name cannot be empty.");
@@ -541,8 +565,6 @@ public class Inventory
 	        if (price < 0) throw new IllegalArgumentException("Price cannot be negative.");
 	        if (quantity < 0) throw new IllegalArgumentException("Quantity cannot be negative.");
 
-	        String updateSQL = "UPDATE items SET itemName=?, category=?, size=?, colour=?, price=?, quantity=? WHERE itemId=?";
-	        PreparedStatement updateStmt = conn.prepareStatement(updateSQL);
 	        updateStmt.setString(1, name);
 	        updateStmt.setString(2, category);
 	        updateStmt.setString(3, size);
@@ -552,7 +574,6 @@ public class Inventory
 	        updateStmt.setInt(7, itemId);
 
 	        int rows = updateStmt.executeUpdate();
-	        updateStmt.close();
 
 	        if (!testMode) {
 	            if (rows > 0) {
@@ -563,7 +584,6 @@ public class Inventory
 	        }
 
 	        rs.close();
-	        selectStmt.close();
 	    }
 	    catch (SQLException e)
 	    {
@@ -609,24 +629,24 @@ public class Inventory
 	        try (ResultSet rs = stmt.executeQuery()) {
 	            while (rs.next()) {
 	                Supplier supplier = null;
-	                int supplierId = rs.getInt("supplier_id");
+	                int supplierId = rs.getInt(SUPPLIER_ID);
 	                
 	                if (!rs.wasNull()) {
 	                    supplier = new Supplier(
 	                        supplierId,
-	                        rs.getString("supplierName"),
-	                        rs.getString("supplierContact")
+	                        rs.getString(SUPPLIER_NAME),
+	                        rs.getString(SUPPLIER_CONTACT)
 	                    );
 	                }
 
 	                Item item = new Item(
-	                    rs.getInt("itemId"),
-	                    rs.getString("itemName"),
-	                    rs.getString("category"),
+	                    rs.getInt(ITEM_ID),
+	                    rs.getString(ITEM_NAME),
+	                    rs.getString(CATEGORY),
 	                    rs.getString("size"),
-	                    rs.getString("colour"),
-	                    rs.getDouble("price"),
-	                    rs.getInt("quantity"),
+	                    rs.getString(COLOUR),
+	                    rs.getDouble(PRICE),
+	                    rs.getInt(QUANTITY),
 	                    supplier
 	                );
 
@@ -647,7 +667,7 @@ public class Inventory
 	                "No Results Found",
 	                JOptionPane.INFORMATION_MESSAGE
 	            );
-	        } else if (!testMode && searchResults.size() > 0) {
+	        } else if (!testMode && !searchResults.isEmpty()) {
 	           
 	        }
 
@@ -677,13 +697,13 @@ public class Inventory
 	}
 	
 	public boolean removeItem(int itemId) {
-	    try (Connection conn = DatabaseConnection.getConnection()) {
-	        String deleteSQL = "DELETE FROM items WHERE itemId = ?";
-	        PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL);
+		String deleteSQL = "DELETE FROM items WHERE itemId = ?";
+		
+	    try (Connection conn = DatabaseConnection.getConnection();
+	    		PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL)) {
 	        deleteStmt.setInt(1, itemId);
 
 	        int rowsAffected = deleteStmt.executeUpdate();
-	        deleteStmt.close();
 
 	        if (rowsAffected > 0) {
 	            if (items != null) {
@@ -731,9 +751,5 @@ public class Inventory
         }
         return lowStock;
     }
-    
-    public Report generateReport(String format)
-	{
-		return null;
-	}
+  
 }
