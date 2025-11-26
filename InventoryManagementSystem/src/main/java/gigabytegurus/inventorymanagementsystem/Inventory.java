@@ -462,12 +462,13 @@ public class Inventory
 
 	        stmt.executeUpdate();
 
-	        System.out.println("Item added successfully to database.");
+	        logger.info("Item added successfully to database.");
 	    }
 	    catch (SQLException e)
 	    {
 	        e.printStackTrace();
-	        System.err.println("Error adding item: " + e.getMessage());
+	        logger.severe("Error adding item: " + e.getMessage());
+
 	    }
 	}
 	
@@ -488,7 +489,14 @@ public class Inventory
 	            return;
 	        }
 
-	        String name, category, size, colour;
+	        String name;
+	        
+	        String category;
+	        
+	        String size;
+	        
+	        String colour;
+	        
 	        double price;
 	        int quantity;
 
@@ -659,7 +667,7 @@ public class Inventory
 	                "No Results Found",
 	                JOptionPane.INFORMATION_MESSAGE
 	            );
-	        } else if (!testMode && searchResults.size() > 0) {
+	        } else if (!testMode && !searchResults.isEmpty()) {
 	           
 	        }
 
@@ -743,9 +751,5 @@ public class Inventory
         }
         return lowStock;
     }
-    
-    public Report generateReport(String format)
-	{
-		return null;
-	}
+  
 }
