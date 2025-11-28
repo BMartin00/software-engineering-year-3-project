@@ -1,3 +1,9 @@
+// A00316625 Nagasai Chintalapati
+// A00318851 Martin  Banyanszki
+// A00320456 Justas Zabitis
+// A00317072 Hamza Hussain
+
+
 package gigabytegurus.inventorymanagementsystem;
 
 import java.sql.Connection;
