@@ -82,7 +82,7 @@ public class Item
 	{
 		return price;
 	}
-
+    
     public int getQuantity()
 	{
 		return quantity;
